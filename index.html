@@ -75,44 +75,57 @@ let data=[];
 
 // ---------- FUNÇÃO DE VALIDAÇÃO DOS MÉTODOS ----------
 function methodValid(total, number, sign, method) {
-    if (sign !== 1 && sign !== -1) sign = 1;
-    let newTotal = total + number * sign;
+    let newTotal = total + (number * sign);
     if (newTotal < 0) return false;
 
-    let totalDigits = String(total).padStart(6,'0').split('').map(Number).reverse();
-    let numberDigits = String(number).padStart(6,'0').split('').map(Number).reverse();
+    let totalDigits = String(total).padStart(6, '0').split('').map(Number).reverse();
+    let numberDigits = String(number).padStart(6, '0').split('').map(Number).reverse();
 
-    let isSimple = true;
-    let isSmall = true;
-    let isBig = false;
+    let hasSmall = false;
+    let hasBig = false;
 
-    for (let i=0;i<totalDigits.length;i++){
-        let t = totalDigits[i];
-        let n = numberDigits[i] * sign;
-        let result = t + n;
+    for (let i = 0; i < totalDigits.length; i++) {
+        let t = totalDigits[i]; // dígito atual (ex: 3)
+        let n = numberDigits[i]; // dígito que entra (ex: 2)
 
-        if(result < 0) return false;
+        if (sign === 1) { // ADIÇÃO
+            if (t + n > 9) {
+                hasBig = true;
+            } else {
+                // Regra do Simple na Adição:
+                // As pedras de baixo (t % 5) somadas às novas (n % 5) não podem passar de 4
+                // E você não pode adicionar 5 se o 5 já estiver ocupado (t >= 5)
+                let beadsBelow = t % 5;
+                let incomingBelow = n % 5;
+                
+                // Se precisar de mais pedras de baixo do que tem livre OU 
+                // se tentar somar 5 e o 5 já estiver lá
+                if (beadsBelow + incomingBelow > 4 || (n >= 5 && t >= 5)) {
+                    hasSmall = true;
+                }
+            }
+        } else { // SUBTRAÇÃO
+            if (t < n) {
+                hasBig = true;
+            } else {
+                // Regra do Simple na Subtração:
+                // Você tem que ter pedras de baixo suficientes para tirar
+                // E se quiser tirar 5, o 5 tem que estar lá (t >= 5)
+                let beadsBelow = t % 5;
+                let outgoingBelow = n % 5;
 
-        // Big Friend: ultrapassa 9 na coluna
-        if(result > 9){
-            isBig = true;
-            isSimple = false;
-            isSmall = false;
-        }
-        // Small Friend: usa pedra 5 para compensar sem ultrapassar 9
-        else if ((t + n > 4 && t + n <= 9 && n !==5 && t !==5) || (t>4 && n<0 && result>=0)){
-            isSimple = false;
+                if (beadsBelow < outgoingBelow || (n >= 5 && t < 5)) {
+                    hasSmall = true;
+                }
+            }
         }
     }
 
-    switch(method){
-        case "Simple": return isSimple;
-        case "Small Friend": return isSmall;
-        case "Big Friend": return isBig;
-        case "Mixed": return isSmall || isBig;
-        case "All": return true;
-        default: return true;
-    }
+    if (method === "Simple") return !hasSmall && !hasBig;
+    if (method === "Small Friend") return hasSmall && !hasBig;
+    if (method === "Big Friend") return hasBig;
+    if (method === "Mixed") return hasSmall && hasBig;
+    return true; // All
 }
 
 // ---------- FUNÇÃO DE GERAÇÃO DE NÚMEROS ----------
