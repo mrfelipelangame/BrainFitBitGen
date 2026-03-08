@@ -1,218 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>BrainFitBit - Soroban Trainer</title>
-
 <style>
-
-body{
-font-family:"Comic Sans MS",cursive,sans-serif;
-max-width:950px;
-margin:auto;
-padding:20px;
-background:#a0daf3;
-color:#2c3e50;
-}
-
-/* PANELS */
-
-#welcome-screen,
-#menu-container,
-#table-container{
-text-align:center;
-background:rgba(255,255,255,0.95);
-padding:30px;
-border-radius:15px;
-box-shadow:0 10px 25px rgba(0,0,0,0.1);
-margin-top:20px;
-}
-
+body{font-family:"Comic Sans MS",cursive,sans-serif;max-width:950px;margin:auto;padding:20px;background:#a0daf3;color:#2c3e50;}
+#welcome-screen,#menu-container,#table-container{text-align:center;background:rgba(255,255,255,0.95);padding:30px;border-radius:15px;box-shadow:0 10px 25px rgba(0,0,0,0.1);margin-top:20px;}
 h1{color:#1a73e8}
-
-input,select,button{
-padding:10px;
-margin:5px;
-border-radius:8px;
-border:1px solid #ccc;
-font-size:1rem;
-}
-
-button{
-cursor:pointer;
-background:#2196F3;
-color:white;
-border:none;
-font-weight:bold;
-transition:transform .2s;
-}
-
-button:hover{
-transform:scale(1.05);
-background:#1976D2;
-}
-
-/* REMOVE NUMBER SPINNERS */
-
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button{
--webkit-appearance:none;
-margin:0;
-}
-
+input,select,button{padding:10px;margin:5px;border-radius:8px;border:1px solid #ccc;font-size:1rem;}
+button{cursor:pointer;background:#2196F3;color:white;border:none;font-weight:bold;transition:transform .2s;}
+button:hover{transform:scale(1.05);background:#1976D2;}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 input[type=number]{-moz-appearance:textfield;}
-
-/* TABLE */
-
-#table-wrapper{
-overflow-x:auto;
-margin:20px 0;
-padding:10px;
-}
-
-table{
-border-collapse:collapse;
-margin:auto;
-background:white;
-border-radius:8px;
-}
-
-td{
-border:1px solid #ddd;
-padding:12px;
-text-align:center;
-font-size:26px;
-min-width:85px;
-font-weight:bold;
-}
-
-.correct{
-background:#9df29d!important;
-border:2px solid green;
-}
-
-.wrong{
-background:#ea9e9e!important;
-border:2px solid red;
-}
-
-.answer-input{
-width:75px;
-text-align:center;
-font-size:1.2rem;
-font-weight:bold;
-outline:none;
-}
-
+#table-wrapper{overflow-x:auto;margin:20px 0;padding:10px;}
+table{border-collapse:collapse;margin:auto;background:white;border-radius:8px;}
+td{border:1px solid #ddd;padding:12px;text-align:center;font-size:26px;min-width:85px;font-weight:bold;}
+.correct{background:#9df29d!important;border:2px solid green;}
+.wrong{background:#ea9e9e!important;border:2px solid red;}
+.answer-input{width:75px;text-align:center;font-size:1.2rem;font-weight:bold;outline:none;}
 .logo-main{max-width:250px}
 .logo-small{max-width:120px;margin-bottom:10px}
-
-/* METHOD BUTTONS */
-
-.method-buttons{
-margin-top:20px;
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-gap:10px;
-}
-
-.method-btn{
-background:#ff9800;
-}
-
-.method-btn:hover{
-background:#e68900;
-}
-
-/* MODAL */
-
-.modal{
-display:none;
-position:fixed;
-z-index:1000;
-left:0;
-top:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.5);
-justify-content:center;
-align-items:center;
-}
-
-.modal-content{
-background:white;
-padding:25px;
-border-radius:12px;
-max-width:500px;
-text-align:left;
-box-shadow:0 10px 25px rgba(0,0,0,0.3);
-}
-
-.close-btn{
-float:right;
-background:#f44336;
-}
-
+.method-buttons{margin-top:20px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;}
+.method-btn{background:#ff9800;}
+.method-btn:hover{background:#e68900;}
+.modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;}
+.modal-content{background:white;padding:25px;border-radius:12px;max-width:500px;text-align:left;box-shadow:0 10px 25px rgba(0,0,0,0.3);}
+.close-btn{float:right;background:#f44336;padding:5px 10px;color:white;border:none;border-radius:5px;cursor:pointer;}
 </style>
-
 </head>
-
 <body>
 
 <!-- WELCOME SCREEN -->
-
 <div id="welcome-screen">
-
 <img src="BrainFitBitCapy.png" class="logo-main">
-
 <h1>Welcome to BrainFitBit!</h1>
-
 <p>Enter your name to start training.</p>
-
-<input type="text" id="student-name" placeholder="Student name">
-
-<br><br>
-
-<button onclick="showMenu()" style="background:#4CAF50;padding:12px 40px">
-Next
-</button>
+<input type="text" id="student-name" placeholder="Student name"><br><br>
+<button onclick="showMenu()" style="background:#4CAF50;padding:12px 40px">Next</button>
 
 <h3>Learn the Soroban Methods</h3>
-
 <div class="method-buttons">
-
 <button class="method-btn" onclick="openModal('simple')">Simple</button>
-
 <button class="method-btn" onclick="openModal('small')">Small Friend</button>
-
 <button class="method-btn" onclick="openModal('big')">Big Friend</button>
-
 <button class="method-btn" onclick="openModal('mixed')">Mixed</button>
-
 </div>
-
 </div>
-
 
 <!-- MENU -->
-
 <div id="menu-container" style="display:none">
-
 <img src="BrainFitBitCapy.png" class="logo-small">
-
 <h2 id="greeting-text"></h2>
-
 <hr>
-
 <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px">
-
-<label>
-<b>Method</b><br>
+<label><b>Method</b><br>
 <select id="method">
 <option>Simple</option>
 <option>Small Friend</option>
@@ -221,309 +63,169 @@ Next
 <option>All</option>
 </select>
 </label>
-
-<label>
-<b>Columns</b><br>
-<input type="number" id="columns" value="1" min="1" max="6">
-</label>
-
-<label>
-<b>Rows</b><br>
-<input type="number" id="rows" value="5" min="1" max="10">
-</label>
-
-<label>
-<b>Questions</b><br>
-<input type="number" id="questions" value="5" min="1" max="10">
-</label>
-
+<label><b>Columns</b><br>
+<input type="number" id="columns" value="1" min="1" max="6"></label>
+<label><b>Rows</b><br>
+<input type="number" id="rows" value="5" min="1" max="10"></label>
+<label><b>Questions</b><br>
+<input type="number" id="questions" value="5" min="1" max="10"></label>
 </div>
-
 <br>
-
-<button onclick="generate()" style="padding:15px 40px;font-size:1.2rem">
-Let's do it!
-</button>
-
+<button onclick="generate()" style="padding:15px 40px;font-size:1.2rem">Let's do it!</button>
 </div>
-
 
 <!-- EXERCISE TABLE -->
-
 <div id="table-container" style="display:none">
-
 <h2 id="table-title"></h2>
-
-<div id="table-wrapper">
-<div id="table"></div>
-</div>
-
+<div id="table-wrapper"><div id="table"></div></div>
 <div id="result-text" style="font-size:1.5rem;font-weight:bold;margin:15px"></div>
-
 <div id="restart-container"></div>
-
 </div>
-
 
 <!-- MODALS -->
-
-<div id="simple" class="modal">
-<div class="modal-content">
-
+<div id="simple" class="modal"><div class="modal-content">
 <button class="close-btn" onclick="closeModal()">Close</button>
-
 <h2>Simple Method</h2>
+<p>Numbers are added/subtracted directly. No bead5 compensation. Result ≤ 9.</p>
+<p><b>Example:</b> 1+3=4, 2+2=4, 5+0=5</p>
+</div></div>
 
-<p>The Simple Method means the numbers can be added or subtracted directly on the soroban without special techniques.</p>
-
-<p><b>Example:</b></p>
-
-<p>3 + 1 = 4</p>
-
-</div>
-</div>
-
-
-<div id="small" class="modal">
-<div class="modal-content">
-
+<div id="small" class="modal"><div class="modal-content">
 <button class="close-btn" onclick="closeModal()">Close</button>
-
 <h2>Small Friend</h2>
+<p>Use bead5 with compensation. Result ≤ 9. Subtraction only if total ≥ number.</p>
+<p><b>Example:</b> 3+2 → +5−3=5, 5−1 → +5−1=4</p>
+</div></div>
 
-<p>This method is used when the lower beads are not enough to complete the operation.</p>
-
-<p><b>Example:</b></p>
-
-<p>4 + 3</p>
-
-<p>Add 5 and subtract 2.</p>
-
-<p>4 + 5 − 2 = 7</p>
-
-</div>
-</div>
-
-
-<div id="big" class="modal">
-<div class="modal-content">
-
+<div id="big" class="modal"><div class="modal-content">
 <button class="close-btn" onclick="closeModal()">Close</button>
-
 <h2>Big Friend</h2>
+<p>Use 10 complement / borrow. Result ≥ 10. Always valid operation (total ≥ number).</p>
+<p><b>Example:</b> 8+7=15, 35−7=28</p>
+</div></div>
 
-<p>This method is used when the operation requires borrowing or carrying with 10.</p>
-
-<p><b>Example:</b></p>
-
-<p>8 + 7</p>
-
-<p>Add 10 and subtract 3.</p>
-
-<p>8 + 10 − 3 = 15</p>
-
-</div>
-</div>
-
-
-<div id="mixed" class="modal">
-<div class="modal-content">
-
+<div id="mixed" class="modal"><div class="modal-content">
 <button class="close-btn" onclick="closeModal()">Close</button>
-
 <h2>Mixed Method</h2>
-
-<p>The Mixed method combines Small Friend and Big Friend techniques.</p>
-
-<p><b>Example:</b></p>
-
-<p>7 + 6</p>
-
-<p>Add 10 and subtract 4.</p>
-
-<p>7 + 10 − 4 = 13</p>
-
-</div>
-</div>
-
+<p>Combines Small and Big Friend techniques as needed.</p>
+<p><b>Example:</b> 7+6 → +10−4=13</p>
+</div></div>
 
 <script>
-
-let data=[]
-let studentName=""
-
-/* START */
+let data=[], studentName="";
 
 function showMenu(){
-
-let name=document.getElementById("student-name").value.trim()
-
-if(!name){
-alert("Please enter your name")
-return
+  let name=document.getElementById("student-name").value.trim();
+  if(!name){alert("Please enter your name"); return;}
+  studentName=name;
+  document.getElementById("welcome-screen").style.display="none";
+  document.getElementById("menu-container").style.display="block";
+  document.getElementById("greeting-text").innerText="Hello "+studentName+"!";
 }
 
-studentName=name
+function openModal(id){document.getElementById(id).style.display="flex";}
+function closeModal(){document.querySelectorAll(".modal").forEach(m=>{m.style.display="none";});}
 
-document.getElementById("welcome-screen").style.display="none"
-document.getElementById("menu-container").style.display="block"
-
-document.getElementById("greeting-text").innerText="Hello "+studentName+"!"
+function generateNumber(maxCols){
+  let cols=Math.floor(Math.random()*maxCols)+1;
+  let min=Math.pow(10,cols-1), max=Math.pow(10,cols)-1;
+  if(cols===1) min=1;
+  return Math.floor(Math.random()*(max-min+1))+min;
 }
 
-/* NUMBER GENERATOR */
+function validMove(total,num,method,op){
+  if(num===0) return false; // +0 or -0 forbidden
+  if(op==='-' && num>total) return false; // can't subtract more than total
+  let newTotal = op==='+'? total+num : total-num;
 
-function generateNumber(maxColumns){
-
-let cols=Math.floor(Math.random()*maxColumns)+1
-
-let min=Math.pow(10,cols-1)
-let max=Math.pow(10,cols)-1
-
-if(cols===1)min=1
-
-return Math.floor(Math.random()*(max-min+1))+min
+  if(method==="Simple"){ // max 9, bead5 constraints
+    if(newTotal>9) return false;
+    if(op==='+' && total%5 + num > 4) return false;
+    return true;
+  }
+  if(method==="Small Friend"){ // bead5 needed
+    if(newTotal>9) return false;
+    return true;
+  }
+  if(method==="Big Friend"){ // result >=10
+    if(newTotal<10) return false;
+    return true;
+  }
+  if(method==="Mixed"){ // any valid positive
+    return newTotal>=0;
+  }
+  return true;
 }
-
-/* GENERATE EXERCISES */
 
 function generate(){
+  let method=document.getElementById("method").value;
+  let cols=parseInt(document.getElementById("columns").value);
+  let rows=parseInt(document.getElementById("rows").value);
+  let q=parseInt(document.getElementById("questions").value);
+  data=[];
 
-let cols=parseInt(document.getElementById("columns").value)
-let rows=parseInt(document.getElementById("rows").value)
-let q=parseInt(document.getElementById("questions").value)
+  for(let i=0;i<q;i++){
+    let moves=[],total=0;
+    for(let r=0;r<rows;r++){
+      let num, op, tries=0;
+      do{
+        num = generateNumber(cols);
+        op = Math.random()<0.5?'+':'-';
+        tries++;
+      }while(!validMove(total,num,method,op) && tries<500);
 
-data=[]
+      if(op==='-') num=-num;
+      total += num;
+      moves.push(num);
+    }
+    data.push({moves:moves,total:total});
+  }
 
-for(let i=0;i<q;i++){
-
-let moves=[]
-let total=0
-
-for(let r=0;r<rows;r++){
-
-let num=generateNumber(cols)
-
-let sign=1
-
-if(r>0) sign=Math.random()<0.5?1:-1
-
-total+=num*sign
-
-moves.push(num*sign)
-
+  render(rows,q);
+  document.getElementById("menu-container").style.display="none";
+  document.getElementById("table-container").style.display="block";
+  document.getElementById("table-title").innerText="Good luck "+studentName+"!";
 }
-
-data.push({moves:moves,total:total})
-
-}
-
-render(rows,q)
-
-document.getElementById("menu-container").style.display="none"
-document.getElementById("table-container").style.display="block"
-
-document.getElementById("table-title").innerText="Good luck "+studentName+"!"
-}
-
-/* RENDER TABLE */
 
 function render(rows,q){
-
-let html="<table>"
-
-for(let r=0;r<rows;r++){
-
-html+="<tr>"
-
-for(let i=0;i<q;i++){
-
-let v=data[i].moves[r]
-
-let display=r===0?Math.abs(v):(v<0?"-"+Math.abs(v):"+"+v)
-
-html+="<td>"+display+"</td>"
+  let html="<table>";
+  for(let r=0;r<rows;r++){
+    html+="<tr>";
+    for(let i=0;i<q;i++){
+      let v=data[i].moves[r];
+      let display = v<0? '-'+Math.abs(v) : '+'+v;
+      html+="<td>"+display+"</td>";
+    }
+    html+="</tr>";
+  }
+  html+="<tr>";
+  for(let i=0;i<q;i++){
+    html+="<td><input type='number' id='a"+i+"' class='answer-input' placeholder='?'></td>";
+  }
+  html+="</tr></table><br><button onclick='check()'>Check Answers</button>";
+  document.getElementById("table").innerHTML=html;
 }
-
-html+="</tr>"
-}
-
-html+="<tr>"
-
-for(let i=0;i<q;i++){
-
-html+="<td><input type='number' id='a"+i+"' class='answer-input' placeholder='?'></td>"
-}
-
-html+="</tr></table>"
-
-html+="<br><button id='check-btn' onclick='check()'>Check Answers</button>"
-
-document.getElementById("table").innerHTML=html
-
-}
-
-/* CHECK */
 
 function check(){
-
-let correct=0
-
-for(let i=0;i<data.length;i++){
-
-let input=document.getElementById("a"+i)
-
-let value=Number(input.value)
-
-if(value===data[i].total){
-
-input.classList.add("correct")
-correct++
-
-}else{
-
-input.classList.add("wrong")
+  let correct=0;
+  for(let i=0;i<data.length;i++){
+    let input=document.getElementById("a"+i);
+    if(!input) continue;
+    let value=Number(input.value);
+    if(value===data[i].total){input.classList.add("correct");correct++;}
+    else input.classList.add("wrong");
+  }
+  document.getElementById("result-text").innerText="Score: "+correct+" / "+data.length;
+  document.getElementById("restart-container").innerHTML="<button onclick='restart()'>Restart</button>";
 }
-}
-
-document.getElementById("result-text").innerText="Score: "+correct+" / "+data.length
-
-document.getElementById("restart-container").innerHTML=
-"<button onclick='restart()'>Restart</button>"
-}
-
-/* RESTART */
 
 function restart(){
-
-document.getElementById("table-container").style.display="none"
-document.getElementById("menu-container").style.display="block"
-
-document.getElementById("result-text").innerText=""
-document.getElementById("restart-container").innerHTML=""
-
-data=[]
+  document.getElementById("table-container").style.display="none";
+  document.getElementById("menu-container").style.display="block";
+  document.getElementById("result-text").innerText="";
+  document.getElementById("restart-container").innerHTML="";
+  data=[];
 }
-
-/* MODALS */
-
-function openModal(id){
-
-document.getElementById(id).style.display="flex"
-
-}
-
-function closeModal(){
-
-document.querySelectorAll(".modal").forEach(m=>{
-
-m.style.display="none"
-
-})
-
-}
-
 </script>
-
 </body>
 </html>
