@@ -1,40 +1,235 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>BrainFitBit</title>
-<style>
-body { font-family: "Comic Sans MS", cursive, sans-serif; max-width: 900px; margin: auto; padding: 20px; background-color: #a0daf3; }
-input, select, button { padding: 8px; margin: 5px; }
-table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-td, th { border: 1px solid #ccc; padding: 10px; text-align: center; }
-.correct { background: #9df29d; }
-.wrong { background: #ea9e9e; }
-button { cursor: pointer; font-weight: bold; }
-table input {
-    text-align: center;       /* centraliza o número digitado */
-    width: 60px;              /* largura fixa para uniformidade */
-    padding: 5px;             /* deixa o input confortável */
-    font-weight: bold;        /* opcional: deixa o número em negrito */
-    font-size: 1rem;          /* tamanho legível */
-    table td {
-    vertical-align: middle;   /* centraliza verticalmente */
-}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrainFitBit - Soroban Trainer</title>
+    <style>
+        body { 
+            font-family: "Comic Sans MS", cursive, sans-serif; 
+            max-width: 950px; 
+            margin: auto; 
+            padding: 20px; 
+            background-color: #a0daf3; 
+            color: #2c3e50;
+        }
+
+        #welcome-screen, #menu-container, #table-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+
+        h1 { color: #1a73e8; margin-bottom: 10px; }
+        input, select, button { padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; }
+        button { cursor: pointer; background-color: #2196F3; color: white; border: none; font-weight: bold; transition: transform 0.2s; }
+        button:hover { transform: scale(1.05); background-color: #1976D2; }
+
+        /* HIDE SPINNERS */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] { -moz-appearance: textfield; }
+
+        #table-wrapper { overflow-x: auto; margin: 20px 0; padding: 10px; }
+        table { border-collapse: collapse; margin: auto; background: white; border-radius: 8px; }
+        td { border: 1px solid #ddd; padding: 12px; text-align: center; font-size: 26px; min-width: 85px; font-weight: bold; }
+
+        .correct { background-color: #9df29d !important; border: 2px solid green; }
+        .wrong { background-color: #ea9e9e !important; border: 2px solid red; }
+        
+        .answer-input { 
+            width: 75px; 
+            text-align: center; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            outline: none;
+        }
+
+        .logo-main { max-width: 250px; height: auto; }
+        .logo-small { max-width: 120px; height: auto; margin-bottom: 10px; }
+    </style>
 </head>
 <body>
 
-<div style="text-align: center;">
-  <img src="BrainFitBitCapy.png" alt="BrainFitBit Image" style="max-width: 30%; height: auto;">
+<div id="welcome-screen">
+    <img src="BrainFitBitCapy.png" alt="BrainFitBit Capybara" class="logo-main">
+    <h1>Welcome to BrainFitBit!</h1>
+    <p>Get your abacus ready! Enter your name to start:</p>
+    <input type="text" id="student-name" placeholder="Student's name">
+    <br><br>
+    <button onclick="showMenu()" style="background-color: #4CAF50; padding: 12px 40px;">Next</button>
 </div>
 
-<div id="menu-container" style="text-align:center;">
-  <b>
-  Method:
-  <select id="method">
-    <option>Simple</option>
-    <option>Small Friend</option>
+<div id="menu-container" style="display: none;">
+    <img src="BrainFitBitCapy.png" alt="BrainFitBit Capybara" class="logo-small">
+    <h2 id="greeting-text"></h2>
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+    
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;">
+        <label><b>Method:</b><br>
+            <select id="method">
+                <option>Simple</option>
+                <option>Small Friend</option>
+                <option>Big Friend</option>
+                <option>Mixed</option>
+                <option>All</option>
+            </select>
+        </label>
+        <label><b>Operations:</b><br>
+            <select id="operation">
+                <option>+</option>
+                <option>-</option>
+                <option>+/-</option>
+            </select>
+        </label>
+        <label><b>Max Columns:</b><br>
+            <input type="number" id="columns" value="1" min="1" max="6" style="width: 50px;">
+        </label>
+        <label><b>Rows:</b><br>
+            <input type="number" id="rows" value="5" min="1" max="10" style="width: 50px;">
+        </label>
+        <label><b>Questions:</b><br>
+            <input type="number" id="questions" value="5" min="1" max="10" style="width: 50px;">
+        </label>
+    </div>
+    <br>
+    <button onclick="generate()" style="padding: 15px 40px; font-size: 1.2rem;">Let's do it!</button>
+</div>
+
+<div id="table-container" style="display: none;">
+    <h2 id="table-title">Exercises</h2>
+    <div id="table-wrapper"><div id="table"></div></div>
+    <div id="result-text" style="font-size: 1.5rem; font-weight: bold; margin: 15px;"></div>
+    <div id="restart-container"></div>
+</div>
+
+<script>
+let data = [];
+let studentName = "";
+
+function showMenu() {
+    studentName = document.getElementById("student-name").value;
+    if (!studentName.trim()) { alert("Please enter your name!"); return; }
+    document.getElementById("welcome-screen").style.display = "none";
+    document.getElementById("menu-container").style.display = "block";
+    document.getElementById("greeting-text").innerText = "Hello, " + studentName + "! Settings:";
+}
+
+function methodValid(total, number, sign, method) {
+    let newTotal = total + (number * sign);
+    if (newTotal < 0) return false;
+    let tDigits = String(total).padStart(6, '0').split('').map(Number).reverse();
+    let nDigits = String(number).padStart(6, '0').split('').map(Number).reverse();
+    let hasSmall = false, hasBig = false;
+
+    for (let i = 0; i < 6; i++) {
+        let t = tDigits[i], n = nDigits[i];
+        if (sign === 1) {
+            if (t + n > 9) hasBig = true;
+            else if ((t % 5) + (n % 5) > 4 || (n >= 5 && t >= 5)) hasSmall = true;
+        } else {
+            if (t < n) hasBig = true;
+            else if ((t % 5) < (n % 5) || (n >= 5 && t < 5)) hasSmall = true;
+        }
+    }
+    if (method === "Simple") return !hasSmall && !hasBig;
+    if (method === "Small Friend") return hasSmall && !hasBig;
+    if (method === "Big Friend") return hasBig;
+    if (method === "Mixed") return hasSmall && hasBig;
+    return true;
+}
+
+// ATUALIZADO: Agora sorteia a quantidade de colunas de forma aleatória até o máximo escolhido
+function generateNumber(maxColumns) {
+    // Sorteia quantas colunas este número específico terá (ex: de 1 até 3)
+    let actualColumns = Math.floor(Math.random() * maxColumns) + 1;
+    
+    let min = Math.pow(10, actualColumns - 1);
+    let max = Math.pow(10, actualColumns) - 1;
+    if (actualColumns === 1) min = 1; 
+    
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function generate() {
+    let method = document.getElementById("method").value;
+    let op = document.getElementById("operation").value;
+    let maxCols = parseInt(document.getElementById("columns").value);
+    let rows = parseInt(document.getElementById("rows").value);
+    let qCount = parseInt(document.getElementById("questions").value);
+
+    data = [];
+    for (let i = 0; i < qCount; i++) {
+        let moves = [], total = 0;
+        for (let r = 0; r < rows; r++) {
+            let num, sign = 1, valid = false, tries = 0;
+            while (!valid && tries < 500) {
+                num = generateNumber(maxCols);
+                if (r > 0) {
+                    if (op === "-") sign = -1;
+                    else if (op === "+/-") sign = Math.random() < 0.5 ? 1 : -1;
+                }
+                if (r === 0 || methodValid(total, num, sign, method)) valid = true;
+                tries++;
+            }
+            if (!valid) { num = 1; sign = (total > 0 && op !== "+") ? -1 : 1; }
+            total += (num * sign);
+            moves.push(num * sign);
+        }
+        data.push({ moves: [...moves], total: total });
+    }
+    render(rows, qCount);
+    document.getElementById("menu-container").style.display = "none";
+    document.getElementById("table-container").style.display = "block";
+    document.getElementById("table-title").innerText = "Good luck, " + studentName + "!";
+}
+
+function render(rows, qCount) {
+    let html = "<table>";
+    for (let r = 0; r < rows; r++) {
+        html += "<tr>";
+        for (let i = 0; i < qCount; i++) {
+            let val = data[i].moves[r];
+            let display = (r === 0) ? Math.abs(val) : (val < 0 ? "-" + Math.abs(val) : "+" + val);
+            html += "<td>" + display + "</td>";
+        }
+        html += "</tr>";
+    }
+    html += "<tr>";
+    for (let i = 0; i < qCount; i++) {
+        html += "<td><input type='number' id='a" + i + "' class='answer-input' placeholder='?'></td>";
+    }
+    html += "</tr></table><br><button onclick='check()' style='padding: 12px 40px;'>Check Answers</button>";
+    document.getElementById("table").innerHTML = html;
+}
+
+function check() {
+    let correct = 0;
+    for (let i = 0; i < data.length; i++) {
+        let input = document.getElementById("a" + i);
+        if (parseInt(input.value) === data[i].total) { input.classList.add("correct"); correct++; }
+        else input.classList.add("wrong");
+    }
+    document.getElementById("result-text").innerText = "Score: " + correct + " out of " + data.length;
+    document.getElementById("restart-container").innerHTML = "<button onclick='restart()' style='background-color:#f44336;'>Restart</button>";
+}
+
+function restart() {
+    document.getElementById("table-container").style.display = "none";
+    document.getElementById("menu-container").style.display = "block";
+    document.getElementById("result-text").innerText = "";
+    document.getElementById("restart-container").innerHTML = "";
+    data = [];
+}
+</script>
+</body>
+</html>    <option>Small Friend</option>
     <option>Big Friend</option>
     <option>Mixed</option>
     <option>All</option>
