@@ -11,6 +11,7 @@ h1{color:#1a73e8}
 input,select,button{padding:10px;margin:5px;border-radius:8px;border:1px solid #ccc;font-size:1rem;}
 button{cursor:pointer;background:#2196F3;color:white;border:none;font-weight:bold;transition:transform .2s;}
 button:hover{transform:scale(1.05);background:#1976D2;}
+button:focus{outline:2px solid #1a73e8;outline-offset:2px;}
 input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
 input[type=number]{-moz-appearance:textfield;}
 #table-wrapper{overflow-x:auto;margin:20px 0;padding:10px;}
@@ -19,24 +20,28 @@ td{border:1px solid #ddd;padding:12px;text-align:center;font-size:26px;min-width
 .correct{background:#9df29d!important;border:2px solid green;}
 .wrong{background:#ea9e9e!important;border:2px solid red;}
 .answer-input{width:75px;text-align:center;font-size:1.2rem;font-weight:bold;outline:none;}
+.answer-input:focus{border:2px solid #2196F3;}
 .logo-main{max-width:250px}
 .logo-small{max-width:120px;margin-bottom:10px}
 .method-buttons{margin-top:20px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;}
 .method-btn{background:#ff9800;}
 .method-btn:hover{background:#e68900;}
+.method-btn:focus{outline:2px solid #ff9800;outline-offset:2px;}
 .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;}
 .modal-content{background:white;padding:25px;border-radius:12px;max-width:500px;text-align:left;box-shadow:0 10px 25px rgba(0,0,0,0.3);}
 .close-btn{float:right;background:#f44336;padding:5px 10px;color:white;border:none;border-radius:5px;cursor:pointer;}
+.close-btn:hover{background:#da190b;}
+label{display:inline-block;margin:10px 5px;}
 </style>
 </head>
 <body>
 
 <!-- WELCOME SCREEN -->
 <div id="welcome-screen">
-<img src="BrainFitBitCapy.png" class="logo-main">
+<img src="BrainFitBitCapy.png" class="logo-main" alt="BrainFitBit Capybara Logo">
 <h1>Welcome to BrainFitBit!</h1>
 <p>Enter your name to start training.</p>
-<input type="text" id="student-name" placeholder="Student name"><br><br>
+<input type="text" id="student-name" placeholder="Student name" aria-label="Student name input"><br><br>
 <button onclick="showMenu()" style="background:#4CAF50;padding:12px 40px">Next</button>
 
 <h3>Learn the Soroban Methods</h3>
@@ -50,12 +55,12 @@ td{border:1px solid #ddd;padding:12px;text-align:center;font-size:26px;min-width
 
 <!-- MENU -->
 <div id="menu-container" style="display:none">
-<img src="BrainFitBitCapy.png" class="logo-small">
+<img src="BrainFitBitCapy.png" class="logo-small" alt="BrainFitBit Capybara Logo">
 <h2 id="greeting-text"></h2>
 <hr>
 <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px">
 <label><b>Method</b><br>
-<select id="method">
+<select id="method" aria-label="Select method">
 <option>Simple</option>
 <option>Small Friend</option>
 <option>Big Friend</option>
@@ -64,11 +69,11 @@ td{border:1px solid #ddd;padding:12px;text-align:center;font-size:26px;min-width
 </select>
 </label>
 <label><b>Columns</b><br>
-<input type="number" id="columns" value="1" min="1" max="6"></label>
+<input type="number" id="columns" value="1" min="1" max="6" aria-label="Number of columns"></label>
 <label><b>Rows</b><br>
-<input type="number" id="rows" value="5" min="1" max="10"></label>
+<input type="number" id="rows" value="5" min="1" max="10" aria-label="Number of rows"></label>
 <label><b>Questions</b><br>
-<input type="number" id="questions" value="5" min="1" max="10"></label>
+<input type="number" id="questions" value="5" min="1" max="10" aria-label="Number of questions"></label>
 </div>
 <br>
 <button onclick="generate()" style="padding:15px 40px;font-size:1.2rem">Let's do it!</button>
@@ -117,14 +122,23 @@ let data=[], studentName="";
 function showMenu(){
   let name=document.getElementById("student-name").value.trim();
   if(!name){alert("Please enter your name"); return;}
-  studentName=name;
+  // Sanitize name to prevent XSS
+  studentName = name.replace(/[<>]/g, "").substring(0, 50);
   document.getElementById("welcome-screen").style.display="none";
   document.getElementById("menu-container").style.display="block";
   document.getElementById("greeting-text").innerText="Hello "+studentName+"!";
 }
 
 function openModal(id){document.getElementById(id).style.display="flex";}
+
 function closeModal(){document.querySelectorAll(".modal").forEach(m=>{m.style.display="none";});}
+
+// Close modal when clicking outside
+window.onclick = function(event){
+  if(event.target.classList.contains("modal")){
+    event.target.style.display="none";
+  }
+}
 
 function generateNumber(maxCols){
   let cols=Math.floor(Math.random()*maxCols)+1;
@@ -159,6 +173,13 @@ function validMove(total,num,method,op){
 
 function generate(){
   let method=document.getElementById("method").value;
+  
+  // Handle "All" method by randomly selecting one
+  if(method==="All"){
+    let methods = ["Simple", "Small Friend", "Big Friend", "Mixed"];
+    method = methods[Math.floor(Math.random()*methods.length)];
+  }
+  
   let cols=parseInt(document.getElementById("columns").value);
   let rows=parseInt(document.getElementById("rows").value);
   let q=parseInt(document.getElementById("questions").value);
@@ -173,6 +194,15 @@ function generate(){
         op = Math.random()<0.5?'+':'-';
         tries++;
       }while(!validMove(total,num,method,op) && tries<500);
+
+      // Log warning if generation fails
+      if(tries>=500){
+        console.warn(`Failed to generate valid move for total=${total}, method=${method} at row ${r}`);
+        // Use a safe fallback: just add 1
+        moves.push(1);
+        total += 1;
+        continue;
+      }
 
       if(op==='-') num=-num;
       total += num;
@@ -200,7 +230,7 @@ function render(rows,q){
   }
   html+="<tr>";
   for(let i=0;i<q;i++){
-    html+="<td><input type='number' id='a"+i+"' class='answer-input' placeholder='?'></td>";
+    html+="<td><input type='number' id='a"+i+"' class='answer-input' placeholder='?' aria-label='Answer for question '+(i+1)></td>";
   }
   html+="</tr></table><br><button onclick='check()'>Check Answers</button>";
   document.getElementById("table").innerHTML=html;
