@@ -118,7 +118,7 @@ function showMenu(){
 }
 
 function generateNumber(maxColumns){
-  let column = Math.floor(Math.random() * maxColumns); 
+  let column = Math.floor(Math.random() * maxColumns);
   let digit = Math.floor(Math.random() * 9) + 1;
   return digit * Math.pow(10, column);
 }
@@ -130,40 +130,42 @@ function validMove(total,num,method,op){
   let newTotal = op===1 ? total + num : total - num;
   if(newTotal < 0) return false;
 
-  // descobrir coluna usada
   let column = Math.floor(Math.log10(num));
   let place = Math.pow(10,column);
 
-  let digit = Math.floor(num/place); // número da coluna (1-9)
-
+  let digit = Math.floor(num/place);
   let tDigit = Math.floor(total/place) % 10;
 
   if(method==="Simple"){
     if(op===1){
-      if(tDigit + digit > 9) return false;
-      if((tDigit % 5) + digit > 4) return false;
+      return (tDigit + digit <= 9) && ((tDigit % 5) + digit <= 4);
     }else{
-      if(tDigit - digit < 0) return false;
-      if((tDigit % 5) < digit % 5) return false;
+      return (tDigit - digit >= 0);
     }
-    return true;
   }
 
   if(method==="Small Friend"){
-    if(op===1) return (tDigit % 5) + digit > 4 && tDigit + digit <= 9;
-    else return (tDigit % 5) < digit % 5 && tDigit >= digit;
+    if(op===1){
+      return (tDigit % 5) + digit > 4 && (tDigit + digit <= 9);
+    }else{
+      return (tDigit % 5) < digit % 5;
+    }
   }
 
   if(method==="Big Friend"){
-    if(op===1) return tDigit + digit > 9;
-    else return tDigit < digit;
+    if(op===1){
+      return (tDigit + digit > 9);
+    }else{
+      return (tDigit < digit);
+    }
   }
 
-  if(method==="Mixed") return true;
+  if(method==="Mixed"){
+    return true;
+  }
 
   return true;
 }
-
 function generate(){
   let method=document.getElementById("method").value;
   let cols=parseInt(document.getElementById("columns").value);
@@ -174,16 +176,16 @@ function generate(){
     let moves=[], total=0;
     for(let r=0;r<rows;r++){
       let num, sign, tries=0, valid=false;
-      while(!valid && tries<500){
+      while(!valid && tries<200){
         num = generateNumber(cols);
         sign=r===0?1:Math.random()<0.5?1:-1;
         valid=validMove(total,num,method,sign);
         tries++;
       }
-      if(!valid){ num=1; sign=1; }
-      total+=sign*num;
-      moves.push(sign*num);
-    }
+      if(!valid){
+  num = generateNumber(cols);
+  sign = 1;
+}
     data.push({moves:moves,total:total});
   }
   render(rows,q);
