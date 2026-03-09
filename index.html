@@ -28,9 +28,29 @@ td{border:1px solid #555;text-align:center;font-size:24px;min-width:50px;font-we
 .modal-content{background:white;padding:25px;border-radius:12px;max-width:500px;text-align:left;box-shadow:0 10px 25px rgba(0,0,0,0.3);}
 .close-btn{float:right;background:#f44336;}
 .abaco-dot{width:20px;height:20px;border-radius:50%;background:#ff9800;margin:2px auto;}
+/* Botão Teacher fixo */
+#teacher-btn{
+  position:fixed;
+  top:20px;
+  right:20px;
+  background:#f44336;
+  color:white;
+  padding:10px 15px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+  z-index:1000;
+}
+#teacher-modal .modal-content input{width:80%; padding:10px; margin:5px; border-radius:5px; border:1px solid #ccc; font-size:1rem;}
+#teacher-modal .modal-content button{margin-top:10px;}
+#teacher-error{color:red;margin-top:10px;}
 </style>
 </head>
 <body>
+
+<!-- Botão Teacher -->
+<button id="teacher-btn" onclick="openTeacherLogin()">Teacher</button>
 
 <!-- WELCOME SCREEN -->
 <div id="welcome-screen">
@@ -83,7 +103,7 @@ td{border:1px solid #555;text-align:center;font-size:24px;min-width:50px;font-we
 <div id="restart-container"></div>
 </div>
 
-<!-- MODALS -->
+<!-- MODALS DOS MÉTODOS -->
 <div id="simple" class="modal"><div class="modal-content">
 <button class="close-btn" onclick="closeModal()">Close</button>
 <h2>Simple Method</h2>
@@ -105,6 +125,18 @@ td{border:1px solid #555;text-align:center;font-size:24px;min-width:50px;font-we
 <p>Combina Small Friend e Big Friend. Ex: 7+6=13 usando 10−4</p>
 </div></div>
 
+<!-- MODAL LOGIN TEACHER -->
+<div id="teacher-modal" class="modal">
+  <div class="modal-content" style="max-width:400px;text-align:center;">
+    <button class="close-btn" onclick="closeModal()">Close</button>
+    <h2>Teacher Login</h2>
+    <input type="text" id="teacher-id" placeholder="ID"><br>
+    <input type="password" id="teacher-pass" placeholder="Password"><br>
+    <button onclick="loginTeacher()">Login</button>
+    <p id="teacher-error"></p>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 let data=[], studentName="";
@@ -118,7 +150,7 @@ function showMenu(){
   document.getElementById("greeting-text").innerText = "Hello "+studentName+"!";
 }
 
-// Gera número para coluna (nunca zero)
+// Gera número para coluna
 function generateNumber(maxColumns){
   let column = Math.floor(Math.random() * maxColumns);
   let digit = Math.floor(Math.random() * 9) + 1;
@@ -130,7 +162,7 @@ function validMove(total,num,method,op){
   if(num===0) return false;
   let newTotal = op===1 ? total+num : total-num;
   if(newTotal<0) return false;
-  return true; // simplificado, pode expandir regras dos métodos aqui
+  return true;
 }
 
 // Gera exercícios
@@ -162,7 +194,7 @@ function generate(){
   document.getElementById("table-title").innerText = "Good luck "+studentName+"!";
 }
 
-// Render estilo ábaco
+// Render tabela
 function render(rows,q){
   let html="<table>";
   for(let r=0;r<rows;r++){
@@ -183,7 +215,7 @@ function render(rows,q){
   document.getElementById("table").innerHTML=html;
 }
 
-// Verifica respostas
+// Check respostas
 function check(){
   let correct=0;
   for(let i=0;i<data.length;i++){
@@ -211,7 +243,19 @@ function restart(){
 
 // Modais
 function openModal(id){ document.getElementById(id).style.display="flex"; }
-function closeModal(){ document.querySelectorAll(".modal").forEach(m=>m.style.display="none"); }
+
+// Teacher Login
+function openTeacherLogin(){ document.getElementById("teacher-modal").style.display="flex"; }
+
+function loginTeacher(){
+  let id=document.getElementById("teacher-id").value.trim();
+  let pass=document.getElementById("teacher-pass").value.trim();
+  if(id==="FelipeMoreno" && pass==="2906Noah"){
+    window.location.href="teacher.html";
+  }else{
+    document.getElementById("teacher-error").innerText="Invalid ID or Password!";
+  }
+}
 
 // PDF
 function savePDF(){
