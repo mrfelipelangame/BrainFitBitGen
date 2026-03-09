@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BrainFitBit - Professor</title>
+<title>BrainFitBit - Teacher Panel</title>
 <style>
 body{font-family:"Comic Sans MS",cursive,sans-serif; max-width:950px;margin:auto;padding:20px;background:#a0daf3;color:#2c3e50;}
 input,select,button{padding:6px;margin:5px;font-size:1rem;}
@@ -16,45 +16,42 @@ td{border:1px solid #555;text-align:center;font-size:16px;padding:5px;}
 </style>
 </head>
 <body>
-<h1>BrainFitBit - Painel do Professor</h1>
+<h1>BrainFitBit - Teacher Panel</h1>
 
-<!-- CADASTRO DE ALUNO -->
-<h2>1️⃣ Cadastrar Novo Aluno</h2>
-<label>Nome:</label>
-<input type="text" id="new-student-name"><br>
-<label>Email:</label>
-<input type="email" id="new-student-email"><br>
-<button onclick="registerStudent()">Cadastrar Aluno</button>
+<h2>1️⃣ Register Student</h2>
+<label>Name:</label><input type="text" id="new-student-name"><br>
+<label>Email:</label><input type="email" id="new-student-email"><br>
+<button onclick="registerStudent()">Register Student</button>
 <p id="register-msg" style="color:green;"></p>
 
 <hr>
 
-<!-- GERAR HOMEWORK -->
-<h2>2️⃣ Gerar Homework</h2>
-<label>Aluno:</label>
-<select id="prof-student-select"></select><br>
-<label>Método:</label>
-<select id="prof-method">
+<h2>2️⃣ Generate Homework</h2>
+<label>Student:</label>
+<select id="teacher-student-select"></select><br>
+<label>Method:</label>
+<select id="teacher-method">
 <option>Simple</option>
 <option>Small Friend</option>
 <option>Big Friend</option>
 <option>Mixed</option>
 <option>All</option>
 </select><br>
-<label>Colunas:</label><input type="number" id="prof-cols" value="3"><br>
-<label>Linhas:</label><input type="number" id="prof-rows" value="5"><br>
-<label>Questões:</label><input type="number" id="prof-questions" value="5"><br>
-<button onclick="generateHomeworkLink()">Gerar Link</button>
+<label>Columns:</label><input type="number" id="teacher-cols" value="3"><br>
+<label>Rows:</label><input type="number" id="teacher-rows" value="5"><br>
+<label>Questions:</label><input type="number" id="teacher-questions" value="5"><br>
+<button onclick="generateHomeworkLink()">Generate Link</button>
 <p id="generated-link"></p>
 
 <hr>
-<h2>3️⃣ Importar respostas JSON</h2>
+
+<h2>3️⃣ Load Student Answers (JSON)</h2>
 <input type="file" id="json-file" accept=".json">
-<button onclick="loadStudentAnswers()">Carregar Respostas</button>
+<button onclick="loadStudentAnswers()">Load Answers</button>
 <div id="answers-container"></div>
 
 <script>
-// ====== ALUNOS ======
+// ====== STUDENTS STORAGE ======
 function saveStudent(name,email){
   let students = JSON.parse(localStorage.getItem("students")||"[]");
   if(name && email && !students.find(s=>s.email===email)){
@@ -64,8 +61,8 @@ function saveStudent(name,email){
 }
 function loadStudents(){
   let students = JSON.parse(localStorage.getItem("students")||"[]");
-  let select = document.getElementById("prof-student-select");
-  select.innerHTML="<option value=''>Selecione aluno</option>";
+  let select = document.getElementById("teacher-student-select");
+  select.innerHTML="<option value=''>Select Student</option>";
   students.forEach(s=>{
     let opt=document.createElement("option");
     opt.value=s.email;
@@ -75,45 +72,49 @@ function loadStudents(){
 }
 loadStudents();
 
-// ====== CADASTRO DE ALUNO ======
+// ====== REGISTER STUDENT ======
 function registerStudent(){
   let name=document.getElementById("new-student-name").value.trim();
   let email=document.getElementById("new-student-email").value.trim();
-  if(!name || !email){ alert("Preencha nome e email!"); return; }
+  if(!name || !email){ alert("Fill name and email!"); return; }
   saveStudent(name,email);
   loadStudents();
-  document.getElementById("register-msg").innerText="Aluno cadastrado com sucesso!";
+  document.getElementById("register-msg").innerText="Student registered successfully!";
   document.getElementById("new-student-name").value="";
   document.getElementById("new-student-email").value="";
 }
 
-// ====== GERAR LINK HOMEWORK ======
+// ====== GENERATE HOMEWORK LINK ======
 function generateHomeworkLink(){
-  let select=document.getElementById("prof-student-select");
-  let studentName = select.value ? select.options[select.selectedIndex].text.split(" (")[0] : "";
-  if(!studentName){ alert("Selecione aluno"); return; }
-  let method=document.getElementById("prof-method").value;
-  let cols=document.getElementById("prof-cols").value;
-  let rows=document.getElementById("prof-rows").value;
-  let q=document.getElementById("prof-questions").value;
+  let select=document.getElementById("teacher-student-select");
+  if(!select.value){ alert("Select a student"); return; }
+  let studentName=select.options[select.selectedIndex].text.split(" (")[0];
+  let method=document.getElementById("teacher-method").value;
+  let cols=Math.max(1,parseInt(document.getElementById("teacher-cols").value)||3);
+  let rows=Math.max(1,parseInt(document.getElementById("teacher-rows").value)||5);
+  let q=Math.max(1,parseInt(document.getElementById("teacher-questions").value)||5);
 
   let url=`brainfitbit.html?student=${encodeURIComponent(studentName)}&method=${method}&cols=${cols}&rows=${rows}&q=${q}`;
   document.getElementById("generated-link").innerText=url;
-  prompt("Copie o link:",url);
+  prompt("Copy the link for the student:",url);
 }
 
-// ====== IMPORTAR JSON ======
+// ====== LOAD STUDENT ANSWERS ======
 function loadStudentAnswers(){
   const fileInput=document.getElementById("json-file");
-  if(fileInput.files.length===0){ alert("Escolha um arquivo JSON"); return; }
+  if(fileInput.files.length===0){ alert("Choose a JSON file"); return; }
   const reader=new FileReader();
   reader.onload=function(e){
-    const content=e.target.result;
-    const data=JSON.parse(content);
-    showAnswers(data);
+    try{
+      const data=JSON.parse(e.target.result);
+      showAnswers(data);
+    }catch(err){
+      alert("Invalid JSON file!");
+    }
   };
   reader.readAsText(fileInput.files[0]);
 }
+
 function showAnswers(data){
   const container=document.getElementById("answers-container");
   container.innerHTML="";
@@ -127,13 +128,15 @@ function showAnswers(data){
       html+="</tr>";
     });
     html+="<tr>";
-    item.studentAnswers.forEach((val,k)=>{
+    let len=Math.min(item.moves.length,item.studentAnswers.length);
+    for(let k=0;k<len;k++){
+      let val=item.studentAnswers[k];
       let cls=val===item.total?"correct":"wrong";
       if(val===item.total) score++;
       html+="<td class='"+cls+"'>"+val+"</td>";
-    });
+    }
     html+="</tr></table>";
-    div.innerHTML=`<b>Q${i+1} - Score: ${score} / ${item.studentAnswers.length}</b><br>`+html+"<hr>";
+    div.innerHTML=`<b>Q${i+1} - Score: ${score} / ${len}</b><br>`+html+"<hr>";
     container.appendChild(div);
   });
 }
