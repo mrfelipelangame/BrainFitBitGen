@@ -26,7 +26,7 @@ td{border:1px solid #555;text-align:center;font-size:16px;padding:5px;}
 
 <hr>
 
-<h2>2️⃣ Generate Homework</h2>
+<h2>2️⃣ Generate Homework & Send Email</h2>
 <label>Student:</label>
 <select id="teacher-student-select"></select><br>
 <label>Method:</label>
@@ -41,7 +41,9 @@ td{border:1px solid #555;text-align:center;font-size:16px;padding:5px;}
 <label>Rows:</label><input type="number" id="teacher-rows" value="5"><br>
 <label>Questions:</label><input type="number" id="teacher-questions" value="5"><br>
 <button onclick="generateHomeworkLink()">Generate Link</button>
+<button onclick="sendHomework()">Send Homework via Email</button>
 <p id="generated-link"></p>
+<p id="email-msg" style="color:green;"></p>
 
 <hr>
 
@@ -49,6 +51,13 @@ td{border:1px solid #555;text-align:center;font-size:16px;padding:5px;}
 <input type="file" id="json-file" accept=".json">
 <button onclick="loadStudentAnswers()">Load Answers</button>
 <div id="answers-container"></div>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script type="text/javascript">
+   (function(){
+      emailjs.init('MukrMYpsZqIkdIG0s'); // sua Public Key
+   })();
+</script>
 
 <script>
 // ====== STUDENTS STORAGE ======
@@ -97,6 +106,33 @@ function generateHomeworkLink(){
   let url=`brainfitbit.html?student=${encodeURIComponent(studentName)}&method=${method}&cols=${cols}&rows=${rows}&q=${q}`;
   document.getElementById("generated-link").innerText=url;
   prompt("Copy the link for the student:",url);
+}
+
+// ====== SEND HOMEWORK EMAIL ======
+function sendHomework(){
+  let select=document.getElementById("teacher-student-select");
+  if(!select.value){ alert("Select a student"); return; }
+  
+  let studentName = select.options[select.selectedIndex].text.split(" (")[0];
+  let studentEmail = select.value;
+  
+  let method=document.getElementById("teacher-method").value;
+  let cols=Math.max(1,parseInt(document.getElementById("teacher-cols").value)||3);
+  let rows=Math.max(1,parseInt(document.getElementById("teacher-rows").value)||5);
+  let q=Math.max(1,parseInt(document.getElementById("teacher-questions").value)||5);
+
+  let homeworkLink = `${window.location.origin}/brainfitbit.html?student=${encodeURIComponent(studentName)}&method=${method}&cols=${cols}&rows=${rows}&q=${q}`;
+  
+  emailjs.send('service_qs2cyzt','template_u09c9if',{
+    student_name: studentName,
+    homework_link: homeworkLink,
+    to_email: studentEmail
+  })
+  .then(function(response){
+    document.getElementById("email-msg").innerText="Homework sent successfully!";
+  }, function(error){
+    alert("Failed to send email. Check EmailJS configuration.");
+  });
 }
 
 // ====== LOAD STUDENT ANSWERS ======
