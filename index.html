@@ -40,7 +40,7 @@ td{border:1px solid #ddd;padding:12px;text-align:center;font-size:26px;min-width
 <br><br>
 <button onclick="showMenu()" style="background:#4CAF50;padding:12px 40px">Next</button>
 
-<h3>Learn the Soroban Methods</h3>
+<h3>Soroban Methods</h3>
 <div class="method-buttons">
 <button class="method-btn" onclick="openModal('simple')">Simple</button>
 <button class="method-btn" onclick="openModal('small')">Small Friend</button>
@@ -210,20 +210,37 @@ function render(rows,q){
     html+="<td><input type='number' id='a"+i+"' class='answer-input' placeholder='?'></td>";
   }
   html+="</tr></table>";
-  html+="<br><button onclick='check()'>Check Answers</button>";
+  html+="<br><button id='check-btn' onclick='check()'>Check Answers</button>";
   document.getElementById("table").innerHTML=html;
 }
 
 function check(){
+
   let correct=0;
+
   for(let i=0;i<data.length;i++){
     let input=document.getElementById("a"+i);
     let val=Number(input.value);
-    if(val===data[i].total){ input.classList.add("correct"); correct++; }
-    else{ input.classList.add("wrong"); }
+
+    if(val===data[i].total){
+      input.classList.add("correct");
+      correct++;
+    }else{
+      input.classList.add("wrong");
+    }
+
+    // bloquear edição
+    input.disabled = true;
   }
+
   document.getElementById("result-text").innerText="Score: "+correct+" / "+data.length;
-  document.getElementById("restart-container").innerHTML="<button onclick='restart()'>Restart</button><button onclick='savePDF()'>Save PDF</button>";
+
+  // remover botão check
+  let checkBtn=document.getElementById("check-btn");
+  if(checkBtn) checkBtn.remove();
+
+  document.getElementById("restart-container").innerHTML=
+  "<button onclick='restart()'>Restart</button><button onclick='savePDF()'>Save PDF</button>";
 }
 
 function restart(){
