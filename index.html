@@ -64,9 +64,9 @@ td{border:1px solid #ddd;padding:12px;text-align:center;font-size:26px;min-width
 <option>All</option>
 </select></label>
 <label><b>Columns</b><br>
-<input type="number" id="columns" value="1" min="1" max="6"></label>
+<input type="number" id="columns" value="1" min="1" max="13"></label>
 <label><b>Rows</b><br>
-<input type="number" id="rows" value="5" min="1" max="10"></label>
+<input type="number" id="rows" value="5" min="2" max="15"></label>
 <label><b>Questions</b><br>
 <input type="number" id="questions" value="5" min="1" max="10"></label>
 </div>
@@ -118,13 +118,11 @@ function showMenu(){
 }
 
 function generateNumber(maxColumns){
-  let cols=Math.floor(Math.random()*maxColumns)+1;
-  let min=Math.pow(10,cols-1);
-  let max=Math.pow(10,cols)-1;
-  if(cols===1) min=1;
-  return Math.floor(Math.random()*(max-min+1))+min;
+  let cols=Math.floor(Math.random()*maxColumns);
+  let column = Math.floor(Math.radom() * 9) + 1;
+  return digit * Math.pow(10, column);
+  
 }
-
 // Validar operação por método
 function validMove(total,num,method,op){
   if(num===0) return false;
