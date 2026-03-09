@@ -12,8 +12,6 @@ input,select,button{padding:10px;margin:5px;border-radius:8px;border:1px solid #
 button{cursor:pointer;background:#2196F3;color:white;border:none;font-weight:bold;transition:transform .2s;}
 button:hover{transform:scale(1.05);background:#1976D2;}
 button:focus{outline:2px solid #1a73e8;outline-offset:2px;}
-input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
-input[type=number]{-moz-appearance:textfield;}
 #table-wrapper{overflow-x:auto;margin:20px 0;padding:10px;}
 table{border-collapse:collapse;margin:auto;background:white;border-radius:8px;}
 td{border:1px solid #ddd;padding:12px;text-align:center;font-size:26px;min-width:85px;font-weight:bold;}
@@ -71,12 +69,31 @@ label{display:inline-block;margin:10px 5px;}
 <option>All</option>
 </select>
 </label>
+
 <label><b>Columns</b><br>
-<input type="number" id="columns" value="1" min="1" max="13" aria-label="Number of columns"></label>
+<select id="columns" aria-label="Number of columns">
+<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+<option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+<option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option>
+</select>
+</label>
+
 <label><b>Rows</b><br>
-<input type="number" id="rows" value="5" min="2" max="15" aria-label="Number of rows"></label>
+<select id="rows" aria-label="Number of rows">
+<option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option>
+<option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option>
+<option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option>
+<option value="14">14</option><option value="15">15</option>
+</select>
+</label>
+
 <label><b>Questions</b><br>
-<input type="number" id="questions" value="5" min="1" max="10" aria-label="Number of questions"></label>
+<select id="questions" aria-label="Number of questions">
+<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+<option value="5" selected>5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+<option value="9">9</option><option value="10">10</option>
+</select>
+</label>
 </div>
 <br>
 <button onclick="generate()" style="padding:15px 40px;font-size:1.2rem">Let's do it!</button>
@@ -102,21 +119,18 @@ label{display:inline-block;margin:10px 5px;}
 <button class="close-btn" onclick="closeModal()">Close</button>
 <h2>Small Friend</h2>
 <p>Use bead5 with compensation. Result ≤ 9. Subtraction only if total ≥ number.</p>
-<p><b>Example:</b> 3+2 → +5−3=5, 5−1 → +5−1=4</p>
 </div></div>
 
 <div id="big" class="modal"><div class="modal-content">
 <button class="close-btn" onclick="closeModal()">Close</button>
 <h2>Big Friend</h2>
 <p>Use 10 complement / borrow. Result ≥ 10. Always valid operation (total ≥ number).</p>
-<p><b>Example:</b> 8+7=15, 35−7=28</p>
 </div></div>
 
 <div id="mixed" class="modal"><div class="modal-content">
 <button class="close-btn" onclick="closeModal()">Close</button>
 <h2>Mixed Method</h2>
 <p>Combines Small and Big Friend techniques as needed.</p>
-<p><b>Example:</b> 7+6 → +10−4=13</p>
 </div></div>
 
 <script>
@@ -125,7 +139,7 @@ let data=[], studentName="";
 function showMenu(){
   let name=document.getElementById("student-name").value.trim();
   if(!name){alert("Please enter your name"); return;}
-  studentName = name.replace(/[<>]/g, "").substring(0, 50);
+  studentName = name.replace(/[<>]/g,"").substring(0,50);
   document.getElementById("welcome-screen").style.display="none";
   document.getElementById("menu-container").style.display="block";
   document.getElementById("greeting-text").innerText="Hello "+studentName+"!";
@@ -137,46 +151,44 @@ window.onclick = function(event){if(event.target.classList.contains("modal")){ev
 
 function generateNumber(maxCols){return Math.floor(Math.random()*9)+1;}
 
-function validMove(total, num, method, op){
-    if(num===0) return false;
-    if(op==='-' && num>total) return false;
-    let newTotal = op==='+'? total+num : total-num;
+function validMove(total,num,method,op){
+  if(num===0) return false;
+  if(op==='-' && num>total) return false;
+  let newTotal = op==='+'? total+num : total-num;
 
-    if(method==="Simple"){
-        if(op==='+'){
-            const validSums = ["1+1","1+2","1+3","1+5","2+5","3+5","4+5"];
-            if(!validSums.includes(total+"+"+num)) return false;
-        }
-        if(op==='-'){ if(newTotal<0) return false; }
-        return true;
+  if(method==="Simple"){
+    if(op==='+'){
+      const validSums=["1+1","1+2","1+3","1+5","2+5","3+5","4+5"];
+      if(!validSums.includes(total+"+"+num)) return false;
     }
-
-    if(method==="Small Friend"){ if(newTotal>9) return false; return true; }
-    if(method==="Big Friend"){ if(newTotal<10) return false; return true; }
-    if(method==="Mixed"){ return newTotal>=0; }
-
+    if(op==='-' && newTotal<0) return false;
     return true;
+  }
+  if(method==="Small Friend"){ if(newTotal>9) return false; return true; }
+  if(method==="Big Friend"){ if(newTotal<10) return false; return true; }
+  if(method==="Mixed"){ return newTotal>=0; }
+  return true;
 }
 
 function generate(){
   let method=document.getElementById("method").value;
   if(method==="All"){
-    let methods = ["Simple","Small Friend","Big Friend","Mixed"];
-    method = methods[Math.floor(Math.random()*methods.length)];
+    const methods=["Simple","Small Friend","Big Friend","Mixed"];
+    method=methods[Math.floor(Math.random()*methods.length)];
   }
 
-  let cols=parseInt(document.getElementById("columns").value);
-  let rows=parseInt(document.getElementById("rows").value);
-  let q=parseInt(document.getElementById("questions").value);
+  let cols=Number(document.getElementById("columns").value);
+  let rows=Number(document.getElementById("rows").value);
+  let q=Number(document.getElementById("questions").value);
   data=[];
 
   for(let i=0;i<q;i++){
-    let moves=[], total=0;
+    let moves=[],total=0;
     for(let r=0;r<rows;r++){
       let num, op, tries=0;
       do{
-        num = generateNumber(cols);
-        op = Math.random()<0.5?'+':'-';
+        num=generateNumber(cols);
+        op=Math.random()<0.5?'+':'-';
         tries++;
       }while(!validMove(total,num,method,op) && tries<500);
       if(tries>=500){moves.push(1); total+=1; continue;}
@@ -199,17 +211,18 @@ function render(rows,q){
     html+="<tr>";
     for(let i=0;i<q;i++){
       let v=data[i].moves[r];
-      let display = v<0? '-'+Math.abs(v) : '+'+v;
+      let display = r===0 ? Math.abs(v) : (v<0?'-'+Math.abs(v):'+'+v);
       html+="<td>"+display+"</td>";
     }
     html+="</tr>";
   }
   html+="<tr>";
   for(let i=0;i<q;i++){
-    html+="<td><input type='number' id='a"+i+"' class='answer-input' placeholder='?' min='0' aria-label='Answer'></td>";
+    html+="<td><input type='number' id='a"+i+"' class='answer-input' placeholder='?' min='0'></td>";
   }
-  html+="</tr></table><br><button onclick='check()'>Check Answers</button>";
-  html+="<br><button onclick='savePDF()'>Download PDF</button>";
+  html+="</tr></table><br>";
+  html+="<button onclick='check()'>Check Answers</button> ";
+  html+="<button onclick='savePDF()'>Download PDF</button>";
   document.getElementById("table").innerHTML=html;
 }
 
@@ -236,18 +249,43 @@ function restart(){
 
 function savePDF(){
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+  const doc=new jsPDF();
   doc.setFontSize(16);
-  doc.text("BrainFitBit Exercise", 14, 20);
-  doc.text("Student: "+studentName, 14, 28);
-  doc.text("Method: "+document.getElementById("method").value, 14, 36);
+  doc.text("BrainFitBit Exercise",14,20);
+  doc.text("Student: "+studentName,14,28);
+  doc.text("Method: "+document.getElementById("method").value,14,36);
   doc.autoTable({
-    html: '#table',
-    startY: 45,
-    theme: 'grid',
-    head: [] // remove cabeçalhos
+    html:'#table',
+    startY:45,
+    theme:'grid',
+    head:[]
   });
   doc.save('BrainFitBit_Exercise.pdf');
+}
+
+// Função de teste automático Simple
+function testeAutomaticoSimple(){
+  const validSums=["1+1","1+2","1+3","1+5","2+5","3+5","4+5"];
+  console.log("=== Teste Automático Simple ===");
+  for(let cols=1; cols<=13; cols++){
+    for(let rows=2; rows<=15; rows++){
+      let tabelaOk=true;
+      for(let r=0;r<rows;r++){
+        for(let c=0;c<cols;c++){
+          let total=Math.floor(Math.random()*9)+1;
+          let num=Math.floor(Math.random()*9)+1;
+          let op=Math.random()<0.5?'+':'-';
+          if(op==='+'){
+            if(!validSums.includes(total+"+"+num)) tabelaOk=false;
+          } else {
+            if(total-num<0) tabelaOk=false;
+          }
+        }
+      }
+      console.log(`Colunas ${cols}, Linhas ${rows} => ${tabelaOk ? "OK ✅" : "ERRO ❌"}`);
+    }
+  }
+  console.log("=== Fim do Teste ===");
 }
 </script>
 </body>
