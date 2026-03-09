@@ -243,4 +243,213 @@ function savePDF(){
 }
 </script>
 </body>
+</html><img src="BrainFitBitCapy.png" class="logo-main" alt="BrainFitBit Logo">
+<h1>Welcome to BrainFitBit!</h1>
+<p>Enter your name to start training.</p>
+<input type="text" id="student-name" placeholder="Student name">
+<br><br>
+<button onclick="showMenu()" style="background:#4CAF50;padding:12px 40px">Next</button>
+
+<h3>Soroban Methods</h3>
+<div class="method-buttons">
+<button class="method-btn" onclick="openModal('simple')">Simple</button>
+<button class="method-btn" onclick="openModal('small')">Small Friend</button>
+<button class="method-btn" onclick="openModal('big')">Big Friend</button>
+<button class="method-btn" onclick="openModal('mixed')">Mixed</button>
+</div>
+</div>
+
+<!-- MENU -->
+<div id="menu-container" style="display:none">
+<img src="BrainFitBitCapy.png" class="logo-small" alt="Logo">
+<h2 id="greeting-text"></h2>
+<hr>
+<div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px">
+<label><b>Method</b><br>
+<select id="method">
+<option>Simple</option>
+<option>Small Friend</option>
+<option>Big Friend</option>
+<option>Mixed</option>
+<option>All</option>
+</select></label>
+<label><b>Columns</b><br>
+<input type="number" id="columns" value="1" min="1" max="13"></label>
+<label><b>Rows</b><br>
+<input type="number" id="rows" value="5" min="2" max="15"></label>
+<label><b>Questions</b><br>
+<input type="number" id="questions" value="5" min="1" max="10"></label>
+</div>
+<br>
+<button onclick="generate()" style="padding:15px 40px;font-size:1.2rem">Let's do it!</button>
+</div>
+
+<!-- TABLE -->
+<div id="table-container" style="display:none">
+<h2 id="table-title"></h2>
+<div id="table-wrapper"><div id="table"></div></div>
+<div id="result-text" style="font-size:1.5rem;font-weight:bold;margin:15px"></div>
+<div id="restart-container"></div>
+</div>
+
+<!-- MODALS -->
+<div id="simple" class="modal"><div class="modal-content">
+<button class="close-btn" onclick="closeModal()">Close</button>
+<h2>Simple Method</h2>
+<p>Simple = soma/subtração direta, sem bead5 ou carry. Ex: 1+5=6</p>
+</div></div>
+<div id="small" class="modal"><div class="modal-content">
+<button class="close-btn" onclick="closeModal()">Close</button>
+<h2>Small Friend</h2>
+<p>Operação que exige bead5. Ex: 3+2=5 usando bead5</p>
+</div></div>
+<div id="big" class="modal"><div class="modal-content">
+<button class="close-btn" onclick="closeModal()">Close</button>
+<h2>Big Friend</h2>
+<p>Operação que exige carry/borrow. Ex: 7+6=13</p>
+</div></div>
+<div id="mixed" class="modal"><div class="modal-content">
+<button class="close-btn" onclick="closeModal()">Close</button>
+<h2>Mixed Method</h2>
+<p>Combina Small Friend e Big Friend. Ex: 7+6=13 usando 10−4</p>
+</div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+let data=[], studentName="";
+
+function showMenu(){
+  let name=document.getElementById("student-name").value.trim();
+  if(!name){ alert("Please enter your name"); return; }
+  studentName=name;
+  document.getElementById("welcome-screen").style.display="none";
+  document.getElementById("menu-container").style.display="block";
+  document.getElementById("greeting-text").innerText = "Hello "+studentName+"!";
+}
+
+// Gera número para coluna (nunca zero)
+function generateNumber(maxColumns){
+  let column = Math.floor(Math.random() * maxColumns);
+  let digit = Math.floor(Math.random() * 9) + 1;
+  return digit * Math.pow(10, column);
+}
+
+// Valida movimento
+function validMove(total,num,method,op){
+  if(num===0) return false;
+  let newTotal = op===1 ? total+num : total-num;
+  if(newTotal<0) return false;
+  return true; // simplificado, pode expandir regras dos métodos aqui
+}
+
+// Gera exercícios
+function generate(){
+  let method=document.getElementById("method").value;
+  let cols=parseInt(document.getElementById("columns").value);
+  let rows=parseInt(document.getElementById("rows").value);
+  let q=parseInt(document.getElementById("questions").value);
+  data=[];
+  for(let i=0;i<q;i++){
+    let moves=[], total=0;
+    for(let r=0;r<rows;r++){
+      let num, sign, tries=0, valid=false;
+      while(!valid && tries<200){
+        num = generateNumber(cols);
+        sign = r===0 ? 1 : (Math.random()<0.5 ? 1 : -1);
+        valid = validMove(total,num,method,sign);
+        tries++;
+      }
+      if(!valid){ num = generateNumber(cols); sign = 1; }
+      moves.push(sign*num);
+      total += sign*num;
+    }
+    data.push({moves:moves,total:total});
+  }
+  render(rows,q);
+  document.getElementById("menu-container").style.display="none";
+  document.getElementById("table-container").style.display="block";
+  document.getElementById("table-title").innerText = "Good luck "+studentName+"!";
+}
+
+// Render estilo ábaco
+function render(rows,q){
+  let html="<table>";
+  for(let r=0;r<rows;r++){
+    html+="<tr>";
+    for(let i=0;i<q;i++){
+      let v = data[i].moves[r];
+      let display = r===0? Math.abs(v) : (v<0 ? "-"+Math.abs(v) : "+"+v);
+      html+="<td>"+display+"</td>";
+    }
+    html+="</tr>";
+  }
+  html+="<tr>";
+  for(let i=0;i<q;i++){
+    html+="<td><input type='number' id='a"+i+"' class='answer-input' placeholder='?'></td>";
+  }
+  html+="</tr></table>";
+  html+="<br><button id='check-btn' onclick='check()'>Check Answers</button>";
+  document.getElementById("table").innerHTML=html;
+}
+
+// Verifica respostas
+function check(){
+  let correct=0;
+  for(let i=0;i<data.length;i++){
+    let input=document.getElementById("a"+i);
+    let val=Number(input.value);
+    if(val===data[i].total){ input.classList.add("correct"); correct++; }
+    else{ input.classList.add("wrong"); }
+    input.disabled = true;
+  }
+  document.getElementById("result-text").innerText="Score: "+correct+" / "+data.length;
+  let checkBtn=document.getElementById("check-btn");
+  if(checkBtn) checkBtn.remove();
+  document.getElementById("restart-container").innerHTML=
+    "<button onclick='restart()'>Restart</button><button onclick='savePDF()'>Save PDF</button>";
+}
+
+// Restart
+function restart(){
+  document.getElementById("table-container").style.display="none";
+  document.getElementById("menu-container").style.display="block";
+  document.getElementById("result-text").innerText="";
+  document.getElementById("restart-container").innerHTML="";
+  data=[];
+}
+
+// Modais
+function openModal(id){ document.getElementById(id).style.display="flex"; }
+function closeModal(){ document.querySelectorAll(".modal").forEach(m=>m.style.display="none"); }
+
+// PDF
+function savePDF(){
+  const { jsPDF } = window.jspdf;
+  let doc = new jsPDF();
+  let logo=document.querySelector(".logo-main");
+  if(logo.complete) doc.addImage(logo,'PNG',15,10,50,25);
+  doc.setFontSize(14);
+  doc.setTextColor(0,0,0);
+  doc.text("Student: "+studentName,15,45);
+  let y=55;
+  data.forEach((item,i)=>{
+    let input=document.getElementById("a"+i);
+    let studentAnswer = Number(input.value);
+    doc.setTextColor(0,0,0);
+    doc.text("Q"+(i+1)+": "+item.moves.join(" "),15,y);
+    if(studentAnswer===item.total){
+      doc.setTextColor(0,150,0);
+      doc.text("Answer: "+studentAnswer+" ✓",150,y);
+    }else{
+      doc.setTextColor(200,0,0);
+      doc.text("Your answer: "+studentAnswer,130,y);
+      doc.setTextColor(0,150,0);
+      doc.text("Correct: "+item.total,170,y);
+    }
+    y+=10;
+  });
+  doc.save("BrainFitBit_Exercises.pdf");
+}
+</script>
+</body>
 </html>
