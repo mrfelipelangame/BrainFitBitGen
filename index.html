@@ -258,13 +258,28 @@ function savePDF(){
   const { jsPDF } = window.jspdf;
   let doc = new jsPDF();
   let logo=document.querySelector(".logo-main");
-  if(logo.complete){ doc.addImage(logo,'PNG',15,10,50,25);}
+  if(logo.complete){ doc.addImage(logo,'PNG',15,10,50,25);
+  }
   doc.setFontSize(14);
+  doc.setTextColor(0,0,0);
   doc.text("Student: "+studentName,15,45);
   let y=55;
+  
   data.forEach((item,i)=>{
-    doc.text("Q"+(i+1)+": "+item.moves.join(" "),15,y);
-    doc.text("Answer: "+item.total,150,y);
+
+    let input=doument.getElementById("a"+i);
+    let studentAnswer = Number(input.value);
+    doc.setTextColor(0,0,0);
+    doc.text("Q+(i+1)+": "+item.moves.join(" "),15,y);
+    
+    if(studentAnswer===item.total){
+      doc.setTextColor(0,150,0; //verde
+      doc.text("Answer: "+studentAswer+" ✓",150,y);
+    }else{
+      doc.setTextColor(200,0,0); // vermelho
+      doc.text("Answer: "+studentAnswer,130,y);
+      
+       }
     y+=10;
   });
   doc.save("BrainFitBit_Exercises.pdf");
