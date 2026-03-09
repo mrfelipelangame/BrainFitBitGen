@@ -5,44 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BrainFitBit - Soroban Trainer</title>
 <style>
-body{font-family:"Comic Sans MS",cursive,sans-serif;max-width:950px;margin:auto;padding:20px;background:#a0daf3;color:#2c3e50;}
-#welcome-screen,#menu-container,#table-container{text-align:center;background:rgba(255,255,255,0.95);padding:30px;border-radius:15px;box-shadow:0 10px 25px rgba(0,0,0,0.1);margin-top:20px;}
-h1{color:#1a73e8}
-input,select,button{padding:10px;margin:5px;border-radius:8px;border:1px solid #ccc;font-size:1rem;}
-button{cursor:pointer;background:#2196F3;color:white;border:none;font-weight:bold;transition:transform .2s;}
-button:hover{transform:scale(1.05);background:#1976D2;}
-button:focus{outline:2px solid #1a73e8;outline-offset:2px;}
+body { font-family:"Comic Sans MS",cursive,sans-serif; max-width:950px; margin:auto; padding:20px; background:#a0daf3; color:#2c3e50; }
+#welcome-screen,#menu-container,#table-container { text-align:center; background:rgba(255,255,255,0.95); padding:30px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.1); margin-top:20px; }
+h1 { color:#1a73e8; margin-bottom:10px; }
+input,select,button { padding:10px; margin:5px; border-radius:8px; border:1px solid #ccc; font-size:1rem; }
+button { cursor:pointer; background:#2196F3; color:white; border:none; font-weight:bold; transition:transform .2s; }
+button:hover { transform:scale(1.05); background:#1976D2; }
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0;}
+input[type=number]{-moz-appearance:textfield;}
 #table-wrapper{overflow-x:auto;margin:20px 0;padding:10px;}
 table{border-collapse:collapse;margin:auto;background:white;border-radius:8px;}
 td{border:1px solid #ddd;padding:12px;text-align:center;font-size:26px;min-width:85px;font-weight:bold;}
 .correct{background:#9df29d!important;border:2px solid green;}
 .wrong{background:#ea9e9e!important;border:2px solid red;}
 .answer-input{width:75px;text-align:center;font-size:1.2rem;font-weight:bold;outline:none;}
-.answer-input:focus{border:2px solid #2196F3;}
-.logo-main{max-width:250px}
-.logo-small{max-width:120px;margin-bottom:10px}
+.logo-main{max-width:250px;height:auto;}
+.logo-small{max-width:120px;height:auto;margin-bottom:10px;}
 .method-buttons{margin-top:20px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;}
 .method-btn{background:#ff9800;}
 .method-btn:hover{background:#e68900;}
-.method-btn:focus{outline:2px solid #ff9800;outline-offset:2px;}
 .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;}
 .modal-content{background:white;padding:25px;border-radius:12px;max-width:500px;text-align:left;box-shadow:0 10px 25px rgba(0,0,0,0.3);}
-.close-btn{float:right;background:#f44336;padding:5px 10px;color:white;border:none;border-radius:5px;cursor:pointer;}
-.close-btn:hover{background:#da190b;}
-.close-btn:focus{outline:2px solid #f44336;outline-offset:2px;}
-label{display:inline-block;margin:10px 5px;}
+.close-btn{float:right;background:#f44336;}
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
 <!-- WELCOME SCREEN -->
 <div id="welcome-screen">
-<img src="BrainFitBitCapy.png" class="logo-main" alt="BrainFitBit Capybara Logo">
-<h1>Welcome!</h1>
+<img src="BrainFitBit.png" class="logo-main" alt="BrainFitBit Logo">
+<h1>Welcome to BrainFitBit!</h1>
 <p>Enter your name to start training.</p>
-<input type="text" id="student-name" placeholder="Student name" aria-label="Student name input"><br><br>
+<input type="text" id="student-name" placeholder="Student name">
+<br><br>
 <button onclick="showMenu()" style="background:#4CAF50;padding:12px 40px">Next</button>
 
 <h3>Learn the Soroban Methods</h3>
@@ -56,50 +51,30 @@ label{display:inline-block;margin:10px 5px;}
 
 <!-- MENU -->
 <div id="menu-container" style="display:none">
-<img src="BrainFitBitCapy.png" class="logo-small" alt="BrainFitBit Capybara Logo">
+<img src="BrainFitBit.png" class="logo-small" alt="Logo">
 <h2 id="greeting-text"></h2>
 <hr>
 <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px">
 <label><b>Method</b><br>
-<select id="method" aria-label="Select method">
+<select id="method">
 <option>Simple</option>
 <option>Small Friend</option>
 <option>Big Friend</option>
 <option>Mixed</option>
 <option>All</option>
-</select>
-</label>
-
+</select></label>
 <label><b>Columns</b><br>
-<select id="columns" aria-label="Number of columns">
-<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-<option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
-<option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option>
-</select>
-</label>
-
+<input type="number" id="columns" value="1" min="1" max="6"></label>
 <label><b>Rows</b><br>
-<select id="rows" aria-label="Number of rows">
-<option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5" selected>5</option>
-<option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option>
-<option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option>
-<option value="14">14</option><option value="15">15</option>
-</select>
-</label>
-
+<input type="number" id="rows" value="5" min="1" max="10"></label>
 <label><b>Questions</b><br>
-<select id="questions" aria-label="Number of questions">
-<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-<option value="5" selected>5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
-<option value="9">9</option><option value="10">10</option>
-</select>
-</label>
+<input type="number" id="questions" value="5" min="1" max="10"></label>
 </div>
 <br>
 <button onclick="generate()" style="padding:15px 40px;font-size:1.2rem">Let's do it!</button>
 </div>
 
-<!-- EXERCISE TABLE -->
+<!-- TABLE -->
 <div id="table-container" style="display:none">
 <h2 id="table-title"></h2>
 <div id="table-wrapper"><div id="table"></div></div>
@@ -111,94 +86,99 @@ label{display:inline-block;margin:10px 5px;}
 <div id="simple" class="modal"><div class="modal-content">
 <button class="close-btn" onclick="closeModal()">Close</button>
 <h2>Simple Method</h2>
-<p>Only direct addition and subtraction. Result must be 0–9.</p>
-<p><b>Allowed sums:</b> 1+1,1+2,1+3,1+5,2+5,3+5,4+5</p>
+<p>Simple = soma/subtração direta, **sem bead5 ou carry**. Ex: 1+5=6, 5+1=6, 4−2=2</p>
 </div></div>
-
 <div id="small" class="modal"><div class="modal-content">
 <button class="close-btn" onclick="closeModal()">Close</button>
 <h2>Small Friend</h2>
-<p>Use bead5 with compensation. Result ≤ 9. Subtraction only if total ≥ number.</p>
+<p>Small Friend = operação que exige bead5. Ex: 3+2=5 usando bead5</p>
 </div></div>
-
 <div id="big" class="modal"><div class="modal-content">
 <button class="close-btn" onclick="closeModal()">Close</button>
 <h2>Big Friend</h2>
-<p>Use 10 complement / borrow. Result ≥ 10. Always valid operation (total ≥ number).</p>
+<p>Big Friend = operação que exige carry/borrow. Ex: 7+6=13</p>
 </div></div>
-
 <div id="mixed" class="modal"><div class="modal-content">
 <button class="close-btn" onclick="closeModal()">Close</button>
 <h2>Mixed Method</h2>
-<p>Combines Small and Big Friend techniques as needed.</p>
+<p>Mixed = combina Small Friend e Big Friend. Ex: 7+6=13 usando 10−4</p>
 </div></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 let data=[], studentName="";
 
 function showMenu(){
   let name=document.getElementById("student-name").value.trim();
   if(!name){alert("Please enter your name"); return;}
-  studentName = name.replace(/[<>]/g,"").substring(0,50);
+  studentName=name;
   document.getElementById("welcome-screen").style.display="none";
   document.getElementById("menu-container").style.display="block";
   document.getElementById("greeting-text").innerText="Hello "+studentName+"!";
 }
 
-function openModal(id){document.getElementById(id).style.display="flex";}
-function closeModal(){document.querySelectorAll(".modal").forEach(m=>{m.style.display="none";});}
-window.onclick = function(event){if(event.target.classList.contains("modal")){event.target.style.display="none";}}
+function generateNumber(maxColumns){
+  let cols=Math.floor(Math.random()*maxColumns)+1;
+  let min=Math.pow(10,cols-1);
+  let max=Math.pow(10,cols)-1;
+  if(cols===1) min=1;
+  return Math.floor(Math.random()*(max-min+1))+min;
+}
 
-function generateNumber(maxCols){return Math.floor(Math.random()*9)+1;}
-
+// Validar operação por método
 function validMove(total,num,method,op){
   if(num===0) return false;
-  if(op==='-' && num>total) return false;
-  let newTotal = op==='+'? total+num : total-num;
+  let newTotal = op===1? total+num : total-num;
+  if(newTotal<0) return false;
 
+  let t = total;
   if(method==="Simple"){
-    if(op==='+'){
-      const validSums=["1+1","1+2","1+3","1+5","2+5","3+5","4+5"];
-      if(!validSums.includes(total+"+"+num)) return false;
+    // Simple não permite bead5 nem carry
+    // bead5 necessário se (total%5 + num >4) ou total+num>9
+    if(op===1){
+      if((t%5 + num >4) || (t+num>9)) return false;
+    } else {
+      if((t%5 < num%5) || t<num) return false;
     }
-    if(op==='-' && newTotal<0) return false;
     return true;
   }
-  if(method==="Small Friend"){ if(newTotal>9) return false; return true; }
-  if(method==="Big Friend"){ if(newTotal<10) return false; return true; }
-  if(method==="Mixed"){ return newTotal>=0; }
+
+  if(method==="Small Friend"){
+    if(op===1) return t%5 + num >4 && t+num <=9;
+    else return t%5 < num%5 && t>=num;
+  }
+
+  if(method==="Big Friend"){
+    if(op===1) return t+num>9;
+    else return t<num;
+  }
+
+  if(method==="Mixed") return true;
   return true;
 }
 
 function generate(){
   let method=document.getElementById("method").value;
-  if(method==="All"){
-    const methods=["Simple","Small Friend","Big Friend","Mixed"];
-    method=methods[Math.floor(Math.random()*methods.length)];
-  }
-
-  let cols=Number(document.getElementById("columns").value);
-  let rows=Number(document.getElementById("rows").value);
-  let q=Number(document.getElementById("questions").value);
+  let cols=parseInt(document.getElementById("columns").value);
+  let rows=parseInt(document.getElementById("rows").value);
+  let q=parseInt(document.getElementById("questions").value);
   data=[];
-
   for(let i=0;i<q;i++){
-    let moves=[],total=0;
+    let moves=[], total=0;
     for(let r=0;r<rows;r++){
-      let num, op, tries=0;
-      do{
+      let num, sign, tries=0, valid=false;
+      while(!valid && tries<500){
         num=generateNumber(cols);
-        op=Math.random()<0.5?'+':'-';
+        sign=r===0?1:Math.random()<0.5?1:-1;
+        valid=validMove(total,num,method,sign);
         tries++;
-      }while(!validMove(total,num,method,op) && tries<500);
-      if(tries>=500){moves.push(1); total+=1; continue;}
-      if(op==='-') num=-num;
-      total+=num;
-      moves.push(num);
+      }
+      if(!valid){ num=1; sign=1; }
+      total+=sign*num;
+      moves.push(sign*num);
     }
     data.push({moves:moves,total:total});
   }
-
   render(rows,q);
   document.getElementById("menu-container").style.display="none";
   document.getElementById("table-container").style.display="block";
@@ -211,18 +191,17 @@ function render(rows,q){
     html+="<tr>";
     for(let i=0;i<q;i++){
       let v=data[i].moves[r];
-      let display = r===0 ? Math.abs(v) : (v<0?'-'+Math.abs(v):'+'+v);
+      let display = r===0? Math.abs(v) : (v<0?"-"+Math.abs(v):"+"+v);
       html+="<td>"+display+"</td>";
     }
     html+="</tr>";
   }
   html+="<tr>";
   for(let i=0;i<q;i++){
-    html+="<td><input type='number' id='a"+i+"' class='answer-input' placeholder='?' min='0'></td>";
+    html+="<td><input type='number' id='a"+i+"' class='answer-input' placeholder='?'></td>";
   }
-  html+="</tr></table><br>";
-  html+="<button onclick='check()'>Check Answers</button> ";
-  html+="<button onclick='savePDF()'>Download PDF</button>";
+  html+="</tr></table>";
+  html+="<br><button onclick='check()'>Check Answers</button>";
   document.getElementById("table").innerHTML=html;
 }
 
@@ -230,13 +209,12 @@ function check(){
   let correct=0;
   for(let i=0;i<data.length;i++){
     let input=document.getElementById("a"+i);
-    if(!input) continue;
-    let value=Number(input.value);
-    if(value===data[i].total){input.classList.add("correct");correct++;}
-    else input.classList.add("wrong");
+    let val=Number(input.value);
+    if(val===data[i].total){ input.classList.add("correct"); correct++; }
+    else{ input.classList.add("wrong"); }
   }
   document.getElementById("result-text").innerText="Score: "+correct+" / "+data.length;
-  document.getElementById("restart-container").innerHTML="<button onclick='restart()'>Restart</button>";
+  document.getElementById("restart-container").innerHTML="<button onclick='restart()'>Restart</button><button onclick='savePDF()'>Save PDF</button>";
 }
 
 function restart(){
@@ -247,45 +225,23 @@ function restart(){
   data=[];
 }
 
+function openModal(id){ document.getElementById(id).style.display="flex"; }
+function closeModal(){ document.querySelectorAll(".modal").forEach(m=>m.style.display="none"); }
+
 function savePDF(){
   const { jsPDF } = window.jspdf;
-  const doc=new jsPDF();
-  doc.setFontSize(16);
-  doc.text("BrainFitBit Exercise",14,20);
-  doc.text("Student: "+studentName,14,28);
-  doc.text("Method: "+document.getElementById("method").value,14,36);
-  doc.autoTable({
-    html:'#table',
-    startY:45,
-    theme:'grid',
-    head:[]
+  let doc = new jsPDF();
+  let logo=document.querySelector(".logo-main");
+  if(logo.complete){ doc.addImage(logo,'PNG',15,10,50,25);}
+  doc.setFontSize(14);
+  doc.text("Student: "+studentName,15,45);
+  let y=55;
+  data.forEach((item,i)=>{
+    doc.text("Q"+(i+1)+": "+item.moves.join(" "),15,y);
+    doc.text("Answer: "+item.total,150,y);
+    y+=10;
   });
-  doc.save('BrainFitBit_Exercise.pdf');
-}
-
-// Função de teste automático Simple
-function testeAutomaticoSimple(){
-  const validSums=["1+1","1+2","1+3","1+5","2+5","3+5","4+5"];
-  console.log("=== Teste Automático Simple ===");
-  for(let cols=1; cols<=13; cols++){
-    for(let rows=2; rows<=15; rows++){
-      let tabelaOk=true;
-      for(let r=0;r<rows;r++){
-        for(let c=0;c<cols;c++){
-          let total=Math.floor(Math.random()*9)+1;
-          let num=Math.floor(Math.random()*9)+1;
-          let op=Math.random()<0.5?'+':'-';
-          if(op==='+'){
-            if(!validSums.includes(total+"+"+num)) tabelaOk=false;
-          } else {
-            if(total-num<0) tabelaOk=false;
-          }
-        }
-      }
-      console.log(`Colunas ${cols}, Linhas ${rows} => ${tabelaOk ? "OK ✅" : "ERRO ❌"}`);
-    }
-  }
-  console.log("=== Fim do Teste ===");
+  doc.save("BrainFitBit_Exercises.pdf");
 }
 </script>
 </body>
