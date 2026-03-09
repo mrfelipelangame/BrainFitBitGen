@@ -118,40 +118,49 @@ function showMenu(){
 }
 
 function generateNumber(maxColumns){
-  let cols=Math.floor(Math.random()*maxColumns);
-  let column = Math.floor(Math.radom() * 9) + 1;
+  let column = Math.floor(Math.random() * maxColumns); 
+  let digit = Math.floor(Math.random() * 9) + 1;
   return digit * Math.pow(10, column);
-  
 }
 // Validar operação por método
 function validMove(total,num,method,op){
-  if(num===0) return false;
-  let newTotal = op===1? total+num : total-num;
-  if(newTotal<0) return false;
 
-  let t = total;
+  if(num===0) return false;
+
+  let newTotal = op===1 ? total + num : total - num;
+  if(newTotal < 0) return false;
+
+  // descobrir coluna usada
+  let column = Math.floor(Math.log10(num));
+  let place = Math.pow(10,column);
+
+  let digit = Math.floor(num/place); // número da coluna (1-9)
+
+  let tDigit = Math.floor(total/place) % 10;
+
   if(method==="Simple"){
-    // Simple não permite bead5 nem carry
-    // bead5 necessário se (total%5 + num >4) ou total+num>9
     if(op===1){
-      if((t%5 + num >4) || (t+num>9)) return false;
-    } else {
-      if((t%5 < num%5) || t<num) return false;
+      if(tDigit + digit > 9) return false;
+      if((tDigit % 5) + digit > 4) return false;
+    }else{
+      if(tDigit - digit < 0) return false;
+      if((tDigit % 5) < digit % 5) return false;
     }
     return true;
   }
 
   if(method==="Small Friend"){
-    if(op===1) return t%5 + num >4 && t+num <=9;
-    else return t%5 < num%5 && t>=num;
+    if(op===1) return (tDigit % 5) + digit > 4 && tDigit + digit <= 9;
+    else return (tDigit % 5) < digit % 5 && tDigit >= digit;
   }
 
   if(method==="Big Friend"){
-    if(op===1) return t+num>9;
-    else return t<num;
+    if(op===1) return tDigit + digit > 9;
+    else return tDigit < digit;
   }
 
   if(method==="Mixed") return true;
+
   return true;
 }
 
@@ -166,7 +175,7 @@ function generate(){
     for(let r=0;r<rows;r++){
       let num, sign, tries=0, valid=false;
       while(!valid && tries<500){
-        num=generateNumber(cols);
+        num = generateNumber(cols);
         sign=r===0?1:Math.random()<0.5?1:-1;
         valid=validMove(total,num,method,sign);
         tries++;
