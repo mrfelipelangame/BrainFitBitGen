@@ -41,25 +41,41 @@
 <div id="menu-container" style="display:none">
     <img src="BrainFitBitCapy.png" class="logo-small" alt="Logo">
     <h2 id="greeting-text"></h2>
+    <p style="color: #666;">Configure your training session below:</p>
     <hr>
-    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:15px">
+    
+    <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:15px; margin-bottom: 20px;">
         <label><b>Method</b><br>
         <select id="method">
             <option value="Simple">Simple</option>
             <option value="Small Friend">Small Friend</option>
             <option value="Big Friend">Big Friend</option>
             <option value="Mixed">Mixed</option>
-            <option value="All">All (Free)</option>
+            <option value="All">All (Free Training)</option>
         </select></label>
+        
         <label><b>Columns</b><br>
-        <input type="number" id="columns" value="1" min="1" max="13"></label>
+        <input type="number" id="columns" value="1" min="1" max="13" style="width: 60px;"></label>
+        
         <label><b>Rows</b><br>
-        <input type="number" id="rows" value="5" min="2" max="15"></label>
+        <input type="number" id="rows" value="5" min="2" max="15" style="width: 60px;"></label>
+        
         <label><b>Questions</b><br>
-        <input type="number" id="questions" value="5" min="1" max="10"></label>
+        <input type="number" id="questions" value="5" min="1" max="10" style="width: 60px;"></label>
     </div>
-    <br>
-    <button onclick="generate()" style="padding:15px 40px;font-size:1.2rem">Let's do it!</button>
+
+    <button onclick="generate()" style="padding:15px 50px; font-size:1.3rem; background:#4CAF50;">Let's do it!</button>
+
+    <div style="text-align:left; max-width:550px; margin:30px auto 10px auto; font-size:0.9rem; background:#fdfdfd; padding:20px; border-radius:12px; border:1px dashed #bbb; line-height: 1.4;">
+        <h3 style="margin-top:0; color:#1a73e8; font-size:1.1rem; text-align: center;">Quick Method Guide</h3>
+        <ul style="list-style-type: none; padding:0; margin:0;">
+            <li style="margin-bottom:8px;"><b>• Simple:</b> Direct beads movement. No formulas required.</li>
+            <li style="margin-bottom:8px;"><b>• Small Friend:</b> Uses the 5-bead for units 1, 2, 3, and 4.</li>
+            <li style="margin-bottom:8px;"><b>• Big Friend:</b> Uses 10-base exchange for sums exceeding 9.</li>
+            <li style="margin-bottom:8px;"><b>• Mixed:</b> Complex moves combining both 5 and 10 friends.</li>
+            <li><b>• All:</b> A random mix of all techniques above.</li>
+        </ul>
+    </div>
 </div>
 
 <div id="table-container" style="display:none">
