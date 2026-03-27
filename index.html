@@ -159,51 +159,112 @@ function generateNumber(maxColumns){
   return digit * Math.pow(10, column);
 }
 
+/**
+ * Verifica se um movimento é válido para o método escolhido, 
+ * analisando o estado das contas no Soroban coluna por coluna.
+ */
 function validMove(total, num, method, op) {
     let newTotal = op === 1 ? total + num : total - num;
     if (newTotal < 0) return false;
     if (method === "All") return true;
 
-    let sTotal = total.toString().split('').reverse();
-    let sNum = num.toString().split('').reverse();
-    let maxLen = Math.max(sTotal.length, sNum.length);
+    let hasRequiredTechnique = false; // Garante que o exercício REALMENTE use o método
 
-    for (let i = 0; i < maxLen; i++) {
-        let dTotal = parseInt(sTotal[i] || 0);
-        let dNum = parseInt(sNum[i] || 0);
-        let hasFive = dTotal >= 5;
-        let lowerBeads = dTotal % 5;
+    // Analisamos até 13 colunas (limite padrão de um Soroban escolar)
+    for (let i = 0; i < 13; i++) {
+        let p = Math.pow(10, i);
+        let dTotal = Math.floor((total / p) % 10); // Dígito atual na coluna
+        let dNum = Math.floor((num / p) % 10);     // Dígito a ser operado
+        
+        if (dNum === 0) continue; 
 
-        if (method === "Simple") {
-            if (op === 1) {
-                if (dTotal + dNum > 9) return false;
-                if (dNum >= 5 && hasFive) return false;
-                if ((dNum % 5) + lowerBeads > 4) return false;
-            } else {
-                if (dTotal < dNum) return false;
-                if (dNum >= 5 && !hasFive) return false;
-                if ((dNum % 5) > lowerBeads) return false;
+        let hasFive = dTotal >= 5;         // Conta de cima (5) está abaixada?
+        let lowerBeads = dTotal % 5;       // Quantas contas de baixo (1-4) estão subidas?
+
+        if (op === 1) { // LÓGICA DE SOMA (+)
+            // Soma Direta (Simple): Há contas de baixo suficientes? 
+            // Se dNum < 5, precisa de (4 - lowerBeads) >= dNum.
+            // Se dNum >= 5, precisa que a conta de 5 esteja livre E as de baixo cheguem.
+            let canSimple = (dNum <= (4 - lowerBeads)) || (dNum >= 5 && !hasFive && (dNum - 5 <= 4 - lowerBeads));
+            
+            // Small Friend (Amigo de 5): Precisa do 5, mas ele está livre?
+            let isSmall = (dNum < 5) && (dNum > (4 - lowerBeads)) && !hasFive;
+            
+            // Big Friend (Amigo de 10): A soma passa de 9?
+            let isBig = (dTotal + dNum >= 10);
+
+            if (method === "Simple") {
+                if (!canSimple || isBig) return false;
+            } else if (method === "Small Friend") {
+                if (isBig) return false; // Small Friend nunca transporta para a esquerda
+                if (isSmall) hasRequiredTechnique = true;
+                else if (!canSimple) return false;
+            } else if (method === "Big Friend") {
+                if (isBig) hasRequiredTechnique = true;
+                // Nota: No Big Friend, movimentos simples são permitidos entre os complexos
             }
         } 
-        else if (method === "Small Friend") {
-            if (op === 1) {
-                if (dTotal + dNum > 9) return false;
-                let needSmall = (dNum % 5) + lowerBeads > 4;
-                if (needSmall && hasFive) return false; 
-            } else {
-                let needSmallSub = (dNum % 5) > lowerBeads;
-                if (needSmallSub && !hasFive) return false;
-            }
-        }
-        else if (method === "Big Friend") {
-            if (op === 1) {
-                // Se a soma dTotal + dNum for <= 9, não é Big Friend puro (é simple ou small)
-                // Big Friend foca no transporte (carry)
-                if (dTotal + dNum < 10) return false; 
+        else { // LÓGICA DE SUBTRAÇÃO (-)
+            let canSimpleSub = (dNum <= lowerBeads) || (dNum >= 5 && hasFive && (dNum - 5 <= lowerBeads));
+            let isSmallSub = (dNum < 5) && (dNum > lowerBeads) && hasFive;
+            let isBigSub = (dTotal < dNum);
+
+            if (method === "Simple") {
+                if (!canSimpleSub || isBigSub) return false;
+            } else if (method === "Small Friend") {
+                if (isBigSub) return false;
+                if (isSmallSub) hasRequiredTechnique = true;
+                else if (!canSimpleSub) return false;
+            } else if (method === "Big Friend") {
+                if (isBigSub) hasRequiredTechnique = true;
             }
         }
     }
+
+    // Se o método exige uma técnica específica, o exercício deve conter pelo menos uma ocorrência dela
+    if ((method === "Small Friend" || method === "Big Friend") && !hasRequiredTechnique) return false;
+
     return true;
+}
+
+/**
+ * Gerador de fluxo principal: Gera números reais (ex: 432) 
+ * e garante que a sequência inteira respeite as regras.
+ */
+function generate() {
+    let method = document.getElementById("method").value;
+    let cols = parseInt(document.getElementById("columns").value);
+    let rows = parseInt(document.getElementById("rows").value);
+    let q = parseInt(document.getElementById("questions").value);
+    
+    data = [];
+    for (let i = 0; i < q; i++) {
+        let moves = [], currentTotal = 0;
+        for (let r = 0; r < rows; r++) {
+            let num, sign, valid = false, tries = 0;
+            
+            while (!valid && tries < 1000) {
+                num = generateFullNumber(cols); 
+                // A primeira linha nunca é negativa
+                sign = (r === 0) ? 1 : (Math.random() < 0.5 ? 1 : -1);
+                
+                valid = validMove(currentTotal, num, method, sign);
+                tries++;
+            }
+
+            // Fallback preventivo (Se o critério for impossível, gera um +1 ou -1 viável)
+            if (!valid) {
+                num = 1;
+                sign = (currentTotal > 0) ? -1 : 1;
+            }
+
+            moves.push(sign * num);
+            currentTotal += (sign * num);
+        }
+        data.push({ moves: moves, total: currentTotal });
+    }
+    render(rows, q);
+    // UI transitions...
 }
 
 function generate(){
