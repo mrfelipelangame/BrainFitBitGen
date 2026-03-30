@@ -274,6 +274,7 @@ function loginTeacher() {
     let id = document.getElementById("teacher-id").value;
     let pass = document.getElementById("teacher-pass").value;
     if(id === "FelipeMoreno" && pass === "2906Noah") alert("Login Success!");
+        window.location.href = "teacher.html";
     else document.getElementById("teacher-error").innerText = "Invalid Login";
 }
 </script>
